@@ -1088,7 +1088,7 @@ async function viewAdmin() {
           <tr><td>Stripe on ${money(a.pricing.print)}</td><td class="num">${usd(stripe(a.pricing.print))}</td></tr>
           <tr><td>Margin</td><td class="num">${printMargin != null ? `${usd(printMargin)} (${Math.round((printMargin / (a.pricing.print / 100)) * 100)}%)` : "-"}</td></tr>
         </tbody></table>
-        <p class="note" style="margin-top:8px">Cheapest book ${usd(c.min, 3)}, dearest ${usd(c.max, 3)}. Painting the shared scenes cost ${usd(c.art.usd)} once. Models: ${esc(c.models.pages)} (pictures), ${esc(c.models.checks)} (checks); prices checked ${esc(c.pricesChecked)}.</p>
+        <p class="note" style="margin-top:8px">Cheapest book ${usd(c.min, 3)}, dearest ${usd(c.max, 3)}. ${c.art.usd > 0 ? `Painting the shared scenes cost ${usd(c.art.usd)} once. ` : ""}Models: ${esc(c.models.pages)} (pictures), ${esc(c.models.checks)} (checks); prices checked ${esc(c.pricesChecked)}.</p>
       </div>
       <div class="paper onpaper"><h3>Printer</h3>
         <p class="note">${esc(a.printer.product)}<br>SKU ${esc(a.printer.pod)} · ${esc(a.printer.base)}${a.printer.configured ? "" : " · not configured"}</p>
