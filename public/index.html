@@ -248,6 +248,13 @@ details{margin-top:16px}summary{cursor:pointer;font-weight:700}
 .plus{color:#1f7a46;font-weight:700}
 .refund{display:grid;gap:8px;margin-top:8px;padding:10px;background:#fff;border-radius:8px}
 .refund[hidden]{display:none}
+/* A pointer down to the shelf */
+.tobooks{display:inline-flex;align-items:center;gap:8px;margin-top:4px;font-weight:700;text-decoration:none;background:rgba(13,18,50,.6);backdrop-filter:blur(8px);border-radius:999px;padding:9px 16px 9px 18px;box-shadow:inset 0 0 0 1.5px rgba(232,178,58,.55)}
+.tobooks svg{color:var(--gold);animation:nudge 1.6s ease-in-out infinite}
+.tobooks:hover{background:rgba(13,18,50,.85)}
+.shelfhead{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.shelfhead .note{color:var(--mist)}
+#shelf{scroll-margin-top:16px}
 /* How it works: one slim strip under the hero */
 .howrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin-top:10px;background:rgba(13,18,50,.62);backdrop-filter:blur(8px);border-radius:16px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
 .howrow div{display:grid;grid-template-columns:auto 1fr;column-gap:12px;padding:18px 22px;align-items:start}
@@ -546,7 +553,7 @@ function viewHome() {
   app.innerHTML = `
     <div class="stage">
       <div class="pitch">
-        ${signedIn ? `<h1>${me.user.name ? `Welcome back, ${esc(me.user.name.split(" ")[0])}.` : "Welcome back."}</h1><p>Every story needs a hero. Choose a book, add a photo, and we'll paint your little one into every page.</p>` : `<h1>Your child, the hero of the story.</h1>
+        ${signedIn ? `<h1>${me.user.name ? `Welcome back, ${esc(me.user.name.split(" ")[0])}.` : "Welcome back."}</h1><p>Every story needs a hero. Choose a book, add a photo, and we'll paint your little one into every page.</p><a class="tobooks" id="tobooks" href="#books" hidden><span id="tobookscount">Your books</span><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 5v13m0 0l-5-5m5 5l5-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>` : `<h1>Your child, the hero of the story.</h1>
         <p>A classic fairy tale, beautifully illustrated with your child on every page. Read it tonight, and keep a printed copy for years to come.</p>
         ${me === null ? `<div class="row"><a class="btn big" href="/auth/google">Get started</a>${catalog?.devLogin ? `<a class="btn ghost" href="/auth/dev">Dev sign-in</a>` : ""}</div>` : ""}`}
       </div>
@@ -558,7 +565,7 @@ function viewHome() {
       <div><i>2</i><b>Add a photo</b><span>One clear photo, plus a few fun facts for the back cover</span></div>
       <div><i>3</i><b>Read it, then keep it</b><span>Read online for $0.99, or get a printed paperback for $24.99, shipping included</span></div>
     </section>`}
-    ${signedIn ? `<section class="band"><h2>Your books</h2><div id="books" class="shelf"><p class="note">Loading your books…</p></div></section>` : ""}
+    ${signedIn ? `<section class="band" id="shelf"><div class="shelfhead"><h2>Your books</h2><span id="shelfcount" class="note"></span></div><div id="books" class="shelf"><p class="note">Loading your books…</p></div></section>` : ""}
     `;
   if (stories.length && me !== undefined) setTimeout(() => document.body.classList.add("risen"), 1200);
   tiltBooks();
@@ -569,6 +576,7 @@ function viewHome() {
     if (im) { const full = new Image(); full.onload = () => { im.src = full.src; }; full.src = im.dataset.full; }
   });
   if (signedIn) drawShelf();
+  $("#tobooks")?.addEventListener("click", (e) => { e.preventDefault(); $("#shelf").scrollIntoView({ behavior: CALM ? "auto" : "smooth", block: "start" }); });
 }
 
 async function drawShelf() {
@@ -576,6 +584,12 @@ async function drawShelf() {
   try {
     const { books } = await api("/api/books");
     if (!$("#books")) return;
+    const done = books.filter((b) => b.status === "done").length;
+    if (books.length) {
+      $("#tobookscount").textContent = `Your ${books.length} ${books.length === 1 ? "book" : "books"}`;
+      $("#tobooks").hidden = false;
+      $("#shelfcount").textContent = `${done} ready to read`;
+    }
     box.innerHTML = books.length ? books.map((b) => {
       const url = b.pages[0]?.url;
       const s = { key: b.story, title: b.title, cover: null };
