@@ -7,7 +7,7 @@ import { createRequire } from "node:module";
 import { log, httpLog } from "./lib/log.js";
 import * as db from "./lib/db.js";
 import { setupAuth, requireUser, requireAdmin, isAdmin, adminLogin, adminPasswordSet, DEV_LOGIN } from "./lib/auth.js";
-import { STORIES } from "./lib/stories.js";
+import { STORIES, pageWords } from "./lib/stories.js";
 import { normalizePhoto, makeThumb, MOCK, BOOK_MODEL } from "./lib/images.js";
 import { CHECK_MODEL, PASS_SCORE } from "./lib/vision.js";
 import { PRICES_CHECKED } from "./lib/cost.js";
@@ -57,7 +57,12 @@ app.get("/catalog.json", (_req, res) => {
     stories: Object.values(STORIES).map((s) => {
       // Each story's most recognisable scene on its cover: Jack up the beanstalk, Red meeting the wolf.
       const cover = sceneFor(s.key, s.key === "jack" ? 9 : 6) || sceneFor(s.key, 1), world = sceneFor(s.key, s.key === "jack" ? 10 : 8);
-      return { key: s.key, title: s.title, role: s.role, pronoun: s.defaultPronoun, ready: storyReady(s.key), cover: showcaseFor(s.key) || (cover ? Number(cover.image_id) : null), world: (s.key === "red" && showcaseFor(s.key)) || (world ? Number(world.image_id) : null) };
+      // A peek inside before buying: a few real pages of the book, with their words.
+      const samples = [1, 4, 7, 10, 14, 17, 20].map((n) => {
+        const sc = sceneFor(s.key, n), page = s.pages[n - 1];
+        return sc ? { n, image: Number(sc.image_id), text: page.title ? s.title : pageWords(page, s.defaultPronoun) } : null;
+      }).filter(Boolean);
+      return { key: s.key, title: s.title, role: s.role, pronoun: s.defaultPronoun, ready: storyReady(s.key), samples, cover: showcaseFor(s.key) || (cover ? Number(cover.image_id) : null), world: (s.key === "red" && showcaseFor(s.key)) || (world ? Number(world.image_id) : null) };
     }),
   });
 });

@@ -277,6 +277,25 @@ details{margin-top:16px}summary{cursor:pointer;font-weight:700}
 .plus{color:#1f7a46;font-weight:700}
 .refund{display:grid;gap:8px;margin-top:8px;padding:10px;background:#fff;border-radius:8px}
 .refund[hidden]{display:none}
+/* Peek inside */
+.getbox{margin-top:18px;background:#fff8e6;border:1px solid var(--edge);border-radius:12px;padding:14px 16px}
+.gethead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-weight:700}
+.get{margin:8px 0 0;padding-left:20px;display:grid;gap:4px;font-size:15px;color:var(--soft)}
+.get b{color:var(--ink)}
+.peeklink{background:none;border:0;padding:0;font-weight:700;color:#8a5a00;text-decoration:underline;text-underline-offset:3px;font-size:15px}
+.peeklink.light{color:var(--mist);font-weight:400;margin-top:-18px}
+.peek{position:fixed;inset:0;z-index:50;background:rgba(6,9,30,.78);backdrop-filter:blur(6px);display:grid;place-items:center;padding:20px;animation:fadeup .25s ease-out}
+.peekcard{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.9fr);gap:24px;width:min(860px,100%);max-height:calc(100vh - 40px);background:var(--paper);color:var(--ink);border-radius:16px;padding:22px;box-shadow:0 30px 70px rgba(0,0,0,.55)}
+.peekx{position:absolute;right:10px;top:8px;background:none;border:0;font-size:30px;line-height:1;color:var(--soft);padding:4px 10px;border-radius:8px}
+.peekx:hover{background:#f3ead6}
+.peekpage{position:relative;aspect-ratio:2/3;max-height:calc(100vh - 84px);border-radius:6px;overflow:hidden;box-shadow:0 12px 26px rgba(0,0,0,.3);justify-self:center;width:100%}
+.peekpage img{width:100%;height:100%;object-fit:cover}
+.peekwords{position:absolute;left:8%;right:8%;bottom:5%;background:rgba(255,251,241,.94);border-radius:10px;padding:10px 12px;text-align:center;font-size:15px;line-height:1.35}
+.peekwords.title{top:5%;bottom:auto;font:700 24px/1.1 Fraunces,Georgia,serif}
+.peekside{display:flex;flex-direction:column;justify-content:center;gap:14px}
+.peekside .note{color:var(--soft)}
+.peekpos{font-weight:700;color:var(--soft);font-size:14px}
+@media (max-width:760px){.peekcard{grid-template-columns:minmax(0,1fr);overflow:auto}.peekpage{max-height:55vh;width:auto}}
 /* A pointer down to the shelf */
 .tobooks{display:inline-flex;align-items:center;gap:8px;margin-top:4px;font-weight:700;text-decoration:none;background:rgba(13,18,50,.6);backdrop-filter:blur(8px);border-radius:999px;padding:9px 16px 9px 18px;box-shadow:inset 0 0 0 1.5px rgba(232,178,58,.55)}
 .tobooks svg{color:var(--gold);animation:nudge 1.6s ease-in-out infinite}
@@ -511,6 +530,38 @@ function dropCoins() {
   for (let i = 0; i < 5; i++) setTimeout(() => { const c = document.createElement("i"); c.className = "coin"; p.append(c); c.onanimationend = () => c.remove(); }, i * 130);
 }
 // Morph between views where the browser can.
+// Peek inside: a few real pages of a story before buying.
+function peek(key) {
+  const s = catalog?.stories.find((x) => x.key === key);
+  if (!s?.samples?.length) return;
+  let i = 0;
+  const box = document.createElement("div");
+  box.className = "peek"; box.setAttribute("role", "dialog"); box.setAttribute("aria-modal", "true"); box.setAttribute("aria-label", `Peek inside ${s.title}`);
+  box.innerHTML = `<div class="peekcard">
+    <button class="peekx" aria-label="Close">×</button>
+    <div class="peekpage"><img alt=""><p class="peekwords"></p></div>
+    <div class="peekside">
+      <h3>${esc(s.title)}</h3>
+      <p class="note">A few pages from the book. In your copy, your child takes the hero's place in every picture, and their name is on the cover.</p>
+      <p class="peekpos"></p>
+      <div class="row"><button class="btn ghost small" data-d="-1">← Back</button><button class="btn ghost small" data-d="1">Next →</button></div>
+      <a class="btn" href="${me?.user ? `#/new/${s.key}` : "/auth/google"}">Make this book · $0.99</a>
+    </div></div>`;
+  const draw = () => {
+    const p = s.samples[i];
+    $("img", box).src = `/art/${p.image}`; $("img", box).alt = `Page ${p.n}`;
+    $(".peekwords", box).textContent = p.text; $(".peekwords", box).classList.toggle("title", p.n === 1);
+    $(".peekpos", box).textContent = `Page ${p.n} of 20`;
+  };
+  const close = () => { box.remove(); removeEventListener("keydown", key2); };
+  const key2 = (e) => { if (e.key === "Escape") close(); if (e.key === "ArrowRight") { i = Math.min(s.samples.length - 1, i + 1); draw(); } if (e.key === "ArrowLeft") { i = Math.max(0, i - 1); draw(); } };
+  box.addEventListener("click", (e) => { if (e.target === box || e.target.closest(".peekx")) close(); const d = e.target.closest("[data-d]"); if (d) { i = Math.max(0, Math.min(s.samples.length - 1, i + +d.dataset.d)); draw(); } if (e.target.closest("a.btn")) close(); });
+  addEventListener("keydown", key2);
+  document.body.append(box); draw(); $(".peekx", box).focus();
+  s.samples.forEach((p) => { new Image().src = `/art/${p.image}`; });
+}
+document.addEventListener("click", (e) => { const b = e.target.closest("[data-peek]"); if (b) { e.preventDefault(); peek(b.dataset.peek); } });
+
 function swap(fn) { document.startViewTransition && !CALM ? document.startViewTransition(fn) : fn(); }
 
 // The world behind everything: the painted story, fading from one to the other.
@@ -587,7 +638,7 @@ function viewHome() {
         ${me === null ? `<div class="row"><a class="btn big" href="/auth/google">Get started</a>${catalog?.devLogin ? `<a class="btn ghost" href="/auth/dev">Dev sign-in</a>` : ""}</div>` : ""}`}
       </div>
       <div class="pick"><p class="pickhint"><span>Choose a story</span><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 4v15m0 0l-6-6m6 6l6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></p>
-      <div class="duo">${stories.map((s) => { const href = signedIn ? `#/new/${s.key}` : "/auth/google"; return `<div class="bookwrap">${bookCard(s, href)}<a class="btn startbtn" href="${href}" aria-label="Start ${esc(s.title)}">Start <span aria-hidden="true">→</span></a></div>`; }).join("")}</div></div>
+      <div class="duo">${stories.map((s) => { const href = signedIn ? `#/new/${s.key}` : "/auth/google"; return `<div class="bookwrap">${bookCard(s, href)}<a class="btn startbtn" href="${href}" aria-label="Start ${esc(s.title)}">Start <span aria-hidden="true">→</span></a><button type="button" class="peeklink light" data-peek="${s.key}">Peek inside</button></div>`; }).join("")}</div></div>
     </div>
     ${`<section class="howrow" aria-label="How it works">
       <div><i>1</i><b>Choose a story</b><span>Jack and the Beanstalk or Little Red Riding Hood</span></div>
@@ -669,6 +720,15 @@ function viewNew(key) {
           <label for="growUp">When I grow up</label><input id="growUp" name="growUp" type="text" maxlength="60">
           <label for="more">Anything else</label><textarea id="more" name="more" maxlength="300"></textarea>
         </details>
+        <div class="getbox">
+          <p class="gethead">What you get for $0.99 <button type="button" class="peeklink" data-peek="${s.key}">Peek inside →</button></p>
+          <ul class="get">
+            <li>A 20-page picture book with <b id="getname">your star</b> as the hero on every page</li>
+            <li>A front cover with their name, and an About Me page on the back</li>
+            <li>Read it here or download the PDF; it's yours to keep</li>
+            <li>Ready in about a minute. If it can't be made, you aren't charged</li>
+          </ul>
+        </div>
         <div class="go">
           <div id="ferr"></div>
           ${s.ready ? (enough
@@ -679,6 +739,7 @@ function viewNew(key) {
       </div>
       ${s.cover && !CALM ? `<div class="swing" aria-hidden="true"><img src="/art/${s.cover}?thumb=1" alt=""><span class="t">${esc(s.title)}</span><div></div></div>` : ""}
     </form>`;
+  $("#name")?.addEventListener("input", (e) => { const v = e.target.value.trim(); $("#getname").textContent = v || "your star"; });
   const setPhoto = (src) => { const ph = $("#ph"); ph.src = src; ph.hidden = false; $("#ovaltext").hidden = true; };
   $("#photo").addEventListener("change", (e) => {
     const f = e.target.files[0];
