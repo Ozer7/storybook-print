@@ -11,7 +11,7 @@ import { STORIES } from "./lib/stories.js";
 import { normalizePhoto, makeThumb, MOCK, BOOK_MODEL } from "./lib/images.js";
 import { CHECK_MODEL, PASS_SCORE } from "./lib/vision.js";
 import { PRICES_CHECKED } from "./lib/cost.js";
-import { ensureArt, status as artStatus, storyReady, artOverview, sceneFor } from "./lib/pregen.js";
+import { ensureArt, status as artStatus, storyReady, artOverview, sceneFor, showcaseFor } from "./lib/pregen.js";
 import { startBook, jobFor } from "./lib/pipeline.js";
 import { buildBookPdf, buildPrintFiles, PUBLISHER } from "./lib/pdf.js";
 import { checkChild } from "./lib/moderate.js";
@@ -57,7 +57,7 @@ app.get("/catalog.json", (_req, res) => {
     stories: Object.values(STORIES).map((s) => {
       // Each story's most recognisable scene on its cover: Jack up the beanstalk, Red meeting the wolf.
       const cover = sceneFor(s.key, s.key === "jack" ? 9 : 6) || sceneFor(s.key, 1), world = sceneFor(s.key, s.key === "jack" ? 10 : 8);
-      return { key: s.key, title: s.title, role: s.role, pronoun: s.defaultPronoun, ready: storyReady(s.key), cover: cover ? Number(cover.image_id) : null, world: world ? Number(world.image_id) : null };
+      return { key: s.key, title: s.title, role: s.role, pronoun: s.defaultPronoun, ready: storyReady(s.key), cover: showcaseFor(s.key) || (cover ? Number(cover.image_id) : null), world: world ? Number(world.image_id) : null };
     }),
   });
 });
