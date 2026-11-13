@@ -1006,7 +1006,7 @@ async function viewPrint(id) {
     btn.disabled = true; btn.textContent = "Asking the printer";
     try {
       quoted = await post(`/api/books/${id}/quote`, { address: address() });
-      const q = quoted.quote, gen = costs?.avg || 0, total = q.total + gen;
+      const q = quoted.quote, gen = costs?.avg || 0;
       const enough = me.balance >= quoted.price;
       $("#s3").classList.remove("locked");
       $("#priceBox").innerHTML = `<div class="vs" style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><b style="font:700 40px/1 Fraunces,Georgia,serif">${money(quoted.price)}</b><span>for one printed copy, shipped by standard mail to ${esc(quoted.address.city)}, ${esc(quoted.address.state)}</span></div>
@@ -1017,11 +1017,11 @@ async function viewPrint(id) {
             <tr><td>Shipping to this address</td><td class="num">${usd(q.shipping)}</td></tr>
             ${q.fulfillment ? `<tr><td>Lulu's handling fee</td><td class="num">${usd(q.fulfillment)}</td></tr>` : ""}${q.fees ? `<tr><td>Other Lulu fees</td><td class="num">${usd(q.fees)}</td></tr>` : ""}
             <tr><td>Sales tax Lulu charges us</td><td class="num">${usd(q.tax)}</td></tr>
-            ${gen ? `<tr><td>Painting the book (average API cost; already paid by the $0.99)</td><td class="num">${usd(gen)}</td></tr>` : ""}
-            <tr class="sum"><td>What this copy costs us</td><td class="num">${usd(q.total)}</td></tr>
+            <tr><td>Stripe's fee on the money coming in (2.9% + $0.30)</td><td class="num">${usd(quoted.stripe)}</td></tr>
+            <tr class="sum"><td>What this copy costs us</td><td class="num">${usd(q.total + quoted.stripe)}</td></tr>
             <tr><td>You pay</td><td class="num">${money(quoted.price)}</td></tr>
             <tr class="sum"><td>Our margin on the printed copy</td><td class="num">${usd(quoted.margin)} (${Math.round((quoted.margin / (quoted.price / 100)) * 100)}%)</td></tr>
-          </tbody></table>${q.mock ? `<p class="note">Sample figures: this server has no Lulu keys.</p>` : `<p class="note">Live quote from Lulu's print-job cost calculator.</p>`}</details>
+          </tbody></table>${gen ? `<p class="note">Painting the book itself cost about ${usd(gen)} in API calls; the $0.99 you already paid covers that.</p>` : ""}${q.mock ? `<p class="note">Sample figures: this server has no Lulu keys.</p>` : `<p class="note">Live quote from Lulu's print-job cost calculator.</p>`}</details>
         <div style="margin-top:16px">${enough ? `<button class="btn big" id="place">Place order for ${money(quoted.price)}</button>` : `<p style="margin-bottom:10px">Your balance is ${money(me.balance)}, so add money first. Nothing has been charged.</p><a class="btn" href="#/money">Add money</a>`}</div>`;
       $("#place")?.addEventListener("click", place);
       $("#s3").scrollIntoView({ behavior: CALM ? "auto" : "smooth", block: "center" });

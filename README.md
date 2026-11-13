@@ -1,6 +1,6 @@
 # Storybook, in print
 
-A 20-page picture book starring you, in under a minute, and a real printed copy at your door. Pick Jack and the Beanstalk or Little Red Riding Hood, upload a photo, and pay $0.99 from your account; approve the PDF, type an address, and order a printed copy for $19.99. MCON 368, "Make it a real book." The previous homework ("Charge for the book") stays frozen at [Ozer7/beanstalk-book](https://github.com/Ozer7/beanstalk-book).
+A 20-page picture book starring you, in under a minute, and a real printed copy at your door. Pick Jack and the Beanstalk or Little Red Riding Hood, upload a photo, and pay $0.99 from your account; approve the PDF, type an address, and order a printed copy for $24.99, shipped. MCON 368, "Make it a real book." The previous homework ("Charge for the book") stays frozen at [Ozer7/beanstalk-book](https://github.com/Ozer7/beanstalk-book).
 
 ## How it works
 
