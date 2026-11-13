@@ -158,7 +158,36 @@ details{margin-top:16px}summary{cursor:pointer;font-weight:700}
 .swing .t{position:absolute;left:8%;right:8%;top:5%;font:700 clamp(20px,2.6vw,30px)/1.05 Fraunces,Georgia,serif;color:#fff3cf;text-shadow:0 2px 10px rgba(0,0,0,.6);backface-visibility:hidden}
 @keyframes swing{to{transform:rotateY(-178deg);visibility:hidden}}
 
-/* Being painted */
+/* Being made */
+.makewrap{display:grid;gap:22px;margin-top:6px}
+.makehead{text-align:center;font:700 clamp(18px,2vw,22px) Fraunces,Georgia,serif;color:var(--mist)}
+.makehead span{color:var(--gold)}
+.makebook{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);max-width:900px;width:100%;margin:0 auto;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .36 0 0 0 0 .2 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E"),var(--paper);color:var(--ink);border-radius:6px;box-shadow:0 30px 60px rgba(3,6,24,.6);position:relative}
+.makebook:after{content:"";position:absolute;top:0;bottom:0;left:50%;width:44px;margin-left:-22px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(60,40,10,.2) 49%,rgba(60,40,10,.26) 50%,transparent)}
+.mpage{padding:clamp(18px,3vw,34px)}
+.mpage.left{display:grid;place-items:center}
+.mpage.right{display:flex;flex-direction:column;justify-content:center;gap:12px}
+.mpage h2{font-size:clamp(24px,2.8vw,34px);min-height:2.2em;display:flex;align-items:flex-end}
+.busy{color:var(--soft);font-size:16.5px;min-height:1.5em}
+.busy.in{animation:fadeup .5s ease-out}
+@keyframes fadeup{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.makebook .bar{height:10px;background:#efe6d2;margin:6px 0 0}
+.makemeta{display:flex;justify-content:space-between;font-size:14.5px;color:var(--soft);font-weight:700}
+.maketip{font-size:14px;color:var(--soft);margin-top:6px}
+.makebook .fresh{width:min(100%,300px);aspect-ratio:2/3;background:#f3ead6;border-radius:4px;box-shadow:0 10px 24px rgba(60,40,10,.25);position:relative;overflow:hidden;display:grid;place-content:center;justify-items:center;gap:10px;color:var(--soft);text-align:center;padding:12px;font-size:15px}
+.makebook .fresh img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:wet .6s ease-out both}
+.brush{display:flex;gap:6px}
+.brush span{width:10px;height:10px;border-radius:50%;background:var(--gold);animation:dot 1.2s ease-in-out infinite}
+.brush span:nth-child(2){animation-delay:.15s;background:var(--jack)}.brush span:nth-child(3){animation-delay:.3s;background:var(--red)}
+@keyframes dot{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(-8px);opacity:1}}
+.film{display:grid;grid-template-columns:repeat(20,minmax(0,1fr));gap:6px;max-width:900px;width:100%;margin:0 auto}
+.film .slot{aspect-ratio:2/3;border-radius:3px;background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);display:grid;place-items:center;overflow:hidden;position:relative}
+.film .pn{font-size:12px;color:rgba(198,208,234,.55);font-weight:700}
+.film .slot.busy{background:linear-gradient(110deg,rgba(255,255,255,.06) 30%,rgba(255,224,138,.35) 50%,rgba(255,255,255,.06) 70%) 0 0/250% 100%;animation:shimmer 1.4s linear infinite}
+@keyframes shimmer{to{background-position:-250% 0}}
+.film .slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:land .45s cubic-bezier(.2,.8,.3,1.2) both}
+@media (max-width:760px){.makebook{grid-template-columns:minmax(0,1fr)}.makebook:after{display:none}.film{grid-template-columns:repeat(10,minmax(0,1fr))}}
+/* Being painted (old) */
 .making{display:grid;grid-template-columns:clamp(70px,10vw,120px) minmax(0,1fr);gap:clamp(14px,3vw,34px);align-items:stretch;margin-top:6px}
 .vine{width:100%;height:100%;min-height:380px;overflow:visible}
 .status h2{min-height:2.2em;font-size:clamp(28px,3.6vw,44px);text-shadow:0 2px 18px rgba(5,8,28,.7)}
@@ -712,61 +741,67 @@ function climbSvg(story) {
   </svg>`;
 }
 
+// While a book is being made: an open book with each new page landing on the left,
+// a little story of what's happening on the right, and the pages filling in below.
+const BUSY = {
+  jack: ["Planting the magic beans", "Growing the beanstalk up past the clouds", "Feeding Milky-White", "Building the giant's castle", "Shining up the golden hen", "Tuning the golden harp", "Waking the giant (quietly)"],
+  red: ["Packing Grandmother's basket", "Picking flowers in the meadow", "Brushing the wolf's fur", "Lighting Grandmother's cottage", "Stitching the red hood", "Sharpening the woodcutter's axe", "Baking the cake"],
+};
 function viewMaking(book) {
-  const words = (catalog?.stories.find((s) => s.key === book.story) || {});
-  app.innerHTML = `<div class="making">
-    <div>${climbSvg(book.story)}</div>
-    <div class="status">
-      <h2 id="stage" aria-live="polite">Looking at your photo</h2>
-      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="barw"><i id="bar" style="width:2%"></i></div>
-      <div class="row note" style="justify-content:space-between"><span id="clock">0 seconds</span><span>${esc(book.title)}, starring ${esc(book.child.name)}</span></div>
-      <div class="easel">
-        <div class="fresh" id="fresh">Your first page is on its way.</div>
-        <div class="slots">${Array.from({ length: 20 }, (_, i) => `<div class="slot" id="s${i + 1}">${i + 1}</div>`).join("")}</div>
-        <p class="legend">Every picture is checked as it's painted. The number on each page is the try that's on it, out of ${MAX_TRIES}. A page that fails the check is painted again; if all ${MAX_TRIES} tries have problems, the best one is kept and marked ★.</p>
+  const lines = BUSY[book.story] || BUSY.jack;
+  app.innerHTML = `<div class="makewrap">
+    <p class="makehead">${esc(book.title)}, <span>starring ${esc(book.child.name)}</span></p>
+    <div class="makebook">
+      <div class="mpage left"><div class="fresh" id="fresh"><div class="brush"><span></span><span></span><span></span></div><p>Your first page is on its way</p></div></div>
+      <div class="mpage right">
+        <h2 id="stage" aria-live="polite">Looking at your photo</h2>
+        <p class="busy" id="busy">${esc(lines[0])}…</p>
+        <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="barw"><i id="bar" style="width:2%"></i></div>
+        <div class="makemeta"><span id="count">0 of 20 pages</span><span id="clock">About a minute</span></div>
+        <p class="maketip">Feel free to stay and watch. Your book will open by itself when it's ready.</p>
       </div>
     </div>
+    <div class="film" aria-label="Pages">${Array.from({ length: 20 }, (_, i) => `<div class="slot" id="s${i + 1}"><span class="pn">${i + 1}</span></div>`).join("")}</div>
   </div>`;
-  const path = $("#climb"), climber = $("#climber"), L = path.getTotalLength();
-  const climbTo = (pct) => {
-    path.style.strokeDashoffset = 100 - pct;
-    const pt = path.getPointAtLength((pct / 100) * L);
-    climber.setAttribute("transform", `translate(${pt.x} ${pt.y})`);
-  };
-  climbTo(2);
+  let li = 0;
+  const rot = setInterval(() => { const b = $("#busy"); if (!b) return clearInterval(rot); li = (li + 1) % lines.length; b.classList.remove("in"); void b.offsetWidth; b.textContent = `${lines[li]}…`; b.classList.add("in"); }, 3200);
   // Pages can land faster than the eye: show them one at a time, new over old.
   const easel = [];
   const show = setInterval(() => {
     const box = $("#fresh"); if (!box) return clearInterval(show);
     const t = easel.shift(); if (!t) return;
-    box.firstChild?.nodeType === 3 && (box.textContent = "");
     const im = new Image(); im.src = t.url; im.alt = `Page ${t.n}, just painted`;
-    im.onload = () => { box.append(im); while (box.children.length > 2) box.firstChild.remove(); };
+    im.onload = () => { box.querySelectorAll(".brush,p").forEach((e) => e.remove()); box.append(im); while (box.querySelectorAll("img").length > 2) box.querySelector("img").remove(); };
   }, 650);
   const started = new Date(book.createdAt).getTime();
-  const tick = setInterval(() => { const el = $("#clock"); if (!el) return clearInterval(tick); const s = Math.max(0, Math.round((Date.now() - started) / 1000)); el.textContent = `${s} second${s === 1 ? "" : "s"}`; }, 500);
+  let pct = 2;
+  const tick = setInterval(() => {
+    const el = $("#clock"); if (!el) return clearInterval(tick);
+    const s = (Date.now() - started) / 1000;
+    const left = Math.round(Math.max(0, 48 - s));
+    el.textContent = pct >= 96 ? "Almost done" : left > 40 ? "About a minute" : left > 5 ? `About ${Math.ceil(left / 5) * 5} seconds left` : "Almost done";
+  }, 500);
   stream?.close();
   stream = new EventSource(`/api/books/${book.id}/events`);
   const seen = new Set();
   stream.onmessage = (ev) => {
-    const s = JSON.parse(ev.data);
+    const st = JSON.parse(ev.data);
     const stage = $("#stage"); if (!stage) return stream.close();
-    if (s.label) stage.textContent = s.label;
-    $("#bar").style.width = `${s.percent}%`; $("#barw").setAttribute("aria-valuenow", Math.round(s.percent));
-    climbTo(s.percent);
-    for (const [n, a] of Object.entries(s.tries || {})) {
-      if (seen.has(+n)) continue;
-      const slot = $(`#s${n}`); if (!slot) continue;
-      slot.innerHTML = `${n}<span class="tries live">try ${a}/${MAX_TRIES}</span>`;
-    }
-    for (const t of s.thumbs || []) {
+    if (st.label) stage.textContent = st.label;
+    pct = st.percent;
+    $("#bar").style.width = `${st.percent}%`; $("#barw").setAttribute("aria-valuenow", Math.round(st.percent));
+    // Pages being painted (or touched up) shimmer; no counters for the reader.
+    for (const n of Object.keys(st.tries || {})) { const slot = $(`#s${n}`); if (slot && !slot.querySelector("img")) slot.classList.add("busy"); }
+    for (const t of st.thumbs || []) {
       if (seen.has(t.n)) continue; seen.add(t.n);
-      $(`#s${t.n}`).innerHTML = `<img src="${t.url}" alt="Page ${t.n}">${triesBadge(t)}`;
+      const slot = $(`#s${t.n}`); slot.classList.remove("busy"); slot.innerHTML = `<img src="${t.url}" alt="Page ${t.n}">`;
       easel.push(t);
     }
-    if (s.stage === "done" || s.stage === "failed" || s.stage === "lost") { stream.close(); clearInterval(tick); setTimeout(() => viewBook(book.id), s.stage === "done" ? 900 : 0); }
+    $("#count").textContent = `${seen.size} of 20 pages`;
+    if (st.stage === "done") { $("#busy").textContent = "Opening your book…"; $("#clock").textContent = "Done"; }
+    if (st.stage === "done" || st.stage === "failed" || st.stage === "lost") { stream.close(); clearInterval(tick); clearInterval(rot); setTimeout(() => viewBook(book.id), st.stage === "done" ? 1100 : 0); }
   };
-  stream.onerror = () => { stream.close(); clearInterval(tick); setTimeout(() => { if ($("#stage")) viewBook(book.id); }, 2000); };
+  stream.onerror = () => { stream.close(); clearInterval(tick); clearInterval(rot); setTimeout(() => { if ($("#stage")) viewBook(book.id); }, 2000); };
 }
 
 function pageHtml(book, i) {
