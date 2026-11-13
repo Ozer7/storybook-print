@@ -56,7 +56,7 @@ app.get("/catalog.json", (_req, res) => {
     art: { state: artStatus.state, done: artStatus.done, total: artStatus.total },
     stories: Object.values(STORIES).map((s) => {
       // Each story's most recognisable scene on its cover: Jack up the beanstalk, Red meeting the wolf.
-      const cover = sceneFor(s.key, s.key === "jack" ? 9 : 6) || sceneFor(s.key, 1), world = sceneFor(s.key, s.key === "jack" ? 10 : 8);
+      const cover = sceneFor(s.key, s.key === "jack" ? 9 : 6) || sceneFor(s.key, 1), world = sceneFor(s.key, s.key === "jack" ? 10 : 13);
       // A peek inside before buying: a few real pages of the book, with their words.
       const samples = [1, 4, 7, 10, 14, 17, 20].map((n) => {
         const sc = sceneFor(s.key, n), page = s.pages[n - 1];
