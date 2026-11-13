@@ -8,12 +8,12 @@ import pg from "pg";
 import { PDFDocument } from "pdf-lib";
 import { startFakeStripe } from "./fake-stripe.js";
 
-const PORT = 3456, STRIPE = 12111;
+const PORT = 3456, STRIPE = 12111, RUN = Date.now();
 const base = `http://localhost:${PORT}`;
 const fake = await startFakeStripe(STRIPE);
 const child = spawn("node", ["server.js"], {
   stdio: ["ignore", process.env.SMOKE_LOGS ? "inherit" : "ignore", "inherit"],
-  env: { ...process.env, PORT, MOCK_IMAGES: "1", MOCK_DELAY_MS: "150", MOCK_FAIL_PAGES: "5", DEV_LOGIN: "1", PGSSL: "0", STRIPE_SECRET_KEY: "sk_test_fake", STRIPE_API_HOST: "localhost", STRIPE_API_PORT: String(STRIPE), STRIPE_API_PROTOCOL: "http", SESSION_SECRET: "x", RENDER: "" },
+  env: { ...process.env, PORT, MOCK_IMAGES: "1", MOCK_DELAY_MS: "150", MOCK_FAIL_PAGES: "5", DEV_LOGIN: "1", PGSSL: "0", STRIPE_SECRET_KEY: "sk_test_fake", STRIPE_API_HOST: "localhost", STRIPE_API_PORT: String(STRIPE), STRIPE_API_PROTOCOL: "http", SESSION_SECRET: "x", RENDER: "", ADMIN_EMAILS: `dev${RUN}@example.com` },
 });
 const done = (code) => { child.kill(); fake.server.close(); process.exit(code); };
 process.on("uncaughtException", (e) => { console.error(e); done(1); });
@@ -39,7 +39,7 @@ console.log("art ok");
 
 // signed out
 assert.equal((await J("/api/books")).status, 401);
-await call(`/auth/dev?u=${Date.now()}`);
+await call(`/auth/dev?u=${RUN}`);
 assert.ok((await J("/api/me")).body.user);
 
 // can't make a book with no money
@@ -99,7 +99,7 @@ for (const story of ["jack", "red"]) {
   console.log(story, "book ok in", Date.now() - t, "ms, pdf", buf.length, "bytes, cost $" + b.timing.costUsd);
 }
 await new Promise((r) => setTimeout(r, 300)); // let the last cost rows land
-const costs = (await J("/api/costs")).body;
+const costs = (await J("/api/costs")).body; // admin only
 assert.ok(costs.books >= 2 && costs.avg > 0 && costs.price === 0.99, "average cost per book shown against $0.99");
 assert.ok(costs.parts.retries > 0, "retries costed separately");
 assert.ok(Math.abs(costs.parts.firstTries + costs.parts.retries + costs.parts.checks - costs.avg) < 0.0005, "the cost parts add up to the average");
@@ -140,7 +140,7 @@ console.log("refund ok");
   const book = (await J("/api/books")).body.books.find((b) => b.status === "done");
   const info = (await J(`/api/books/${book.id}/print`)).body;
   assert.equal(info.approval, null);
-  assert.ok(info.configured && info.sandbox);
+  assert.ok(info.configured);
   const address = { name: "Sarah Levi", street1: "120 Broadway", city: "New York", state: "NY", zip: "10271", phone: "212 555 0100" };
   assert.equal((await J(`/api/books/${book.id}/orders`, { method: "POST", json: { address } })).status, 409, "no order before approval");
   assert.equal((await J(`/api/books/${book.id}/approve`, { method: "POST", json: { hash: "stale" } })).status, 409, "approval must match what was seen");
@@ -175,6 +175,8 @@ console.log("refund ok");
   const w3 = (await J("/api/wallet")).body;
   assert.equal(w3.balance, before + 2500, "cancel puts the money back");
   assert.ok(w3.ledger.some((l) => l.kind === "print") && w3.ledger.some((l) => l.kind === "print_refund"));
+  const admin = (await J("/api/admin/summary")).body;
+  assert.ok(admin.orders?.length >= 1 && admin.costs?.avg > 0, "admin summary: " + JSON.stringify(admin).slice(0, 300));
   console.log("print ok: price", q.body.price, "cost", q.body.quote.total, "margin", q.body.margin);
   globalThis.printedBook = book.id;
 }
@@ -187,6 +189,9 @@ const mine = cookie; cookie = ""; await call(`/auth/dev?u=other${Date.now()}`);
 assert.equal((await call(img)).status, 404);
 assert.equal((await call(`/api/books/${id0.id}`)).status, 404);
 assert.equal((await call(`/api/books/${globalThis.printedBook}/print`)).status, 404, "or order a print of it");
+assert.equal((await call("/api/costs")).status, 404, "costs are admin only");
+assert.equal((await call("/api/admin/summary")).status, 404, "the admin page is admin only");
+assert.equal((await J("/api/me")).body.admin, false);
 cookie = mine;
 console.log("all ok");
 done(0);

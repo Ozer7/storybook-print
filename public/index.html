@@ -3,8 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Storybook: a picture book with you in it</title>
-<meta name="description" content="Upload a photo and get a 20-page picture book starring you, in under a minute.">
+<title>Storybook | Personalized picture books by Bluebid Books</title>
+<meta name="description" content="Personalized fairy-tale picture books starring your child. Upload a photo, read it in about a minute, and order a printed paperback delivered to your door.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath fill=%22%23e8b23a%22 d=%22M12 6C9.5 4.2 6 3.8 2.5 4.5v14c3.5-.7 7-.3 9.5 1.5 2.5-1.8 6-2.2 9.5-1.5v-14C18 3.8 14.5 4.2 12 6z%22/%3E%3C/svg%3E">
+<meta name="theme-color" content="#171f3f">
 <link rel="preload" href="/fonts/andika/andika-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/fraunces/fraunces-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -54,7 +56,9 @@ header{display:flex;align-items:center;gap:16px;padding:18px 0}
 .onpaper .note,.paper .note,.open .note{color:var(--soft)}
 .err{background:#fbe6e6;color:#7c1a21;border-radius:8px;padding:10px 14px;margin:12px 0}
 .ok{background:#e4f2e8;color:#1b5234;border-radius:8px;padding:10px 14px;margin:12px 0}
-footer{padding:40px 0 44px;display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
+footer{padding:40px 0 44px;display:grid;justify-items:center;gap:14px}
+footer nav{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
+footer p{color:var(--mist);font-size:14px}
 footer a{display:inline-block;padding:10px 20px;border-radius:999px;background:rgba(13,18,50,.68);backdrop-filter:blur(10px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);text-decoration:none;font-weight:700;font-size:15px;transition:background .15s,transform .15s}
 footer a:hover{background:rgba(43,52,104,.9);transform:translateY(-1px)}
 .hero{padding:16px 0 4px;display:grid;gap:14px}
@@ -217,6 +221,18 @@ details{margin-top:16px}summary{cursor:pointer;font-weight:700}
 .plus{color:#1f7a46;font-weight:700}
 .refund{display:grid;gap:8px;margin-top:8px;padding:10px;background:#fff;border-radius:8px}
 .refund[hidden]{display:none}
+/* How it works */
+.how{margin-top:34px;display:grid;gap:22px}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.steps>div{background:rgba(13,18,50,.72);border-radius:14px;padding:22px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+.steps i{font:700 16px/1 Fraunces,Georgia,serif;font-style:normal;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--gold);color:#241a02;margin-bottom:12px}
+.steps h3{margin-bottom:6px}.steps p{color:var(--mist);font-size:16px}
+.prices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.prices>div{display:grid;gap:2px;background:var(--paper);color:var(--ink);border-radius:14px;padding:20px 22px}
+.prices b{font:700 38px/1.05 Fraunces,Georgia,serif}.prices span{font-weight:700}.prices small{color:var(--soft);font-size:15px}
+.admin .stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:10px}
+.admin .stat div{background:#fff;border-radius:10px;padding:12px 14px}.admin .stat b{display:block;font:700 26px/1.1 Fraunces,Georgia,serif}.admin .stat span{color:var(--soft);font-size:14px}
+.admin .table{font-size:14.5px}
 /* A printed copy */
 .print{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:clamp(20px,4vw,40px);align-items:start;margin-top:14px}
 .step{display:flex;align-items:center;gap:10px;margin-bottom:10px}
@@ -238,6 +254,7 @@ details{margin-top:16px}summary{cursor:pointer;font-weight:700}
 .inside{position:absolute;inset:0;background:var(--paper);color:var(--ink);display:flex;flex-direction:column;justify-content:flex-end;align-items:center;text-align:center;padding:9cqw 12cqw 13cqw;gap:2.2cqw;font-size:2.5cqw;line-height:1.45}
 .inside h4{font:700 3.6cqw/1.25 Fraunces,Georgia,serif;color:var(--story);margin:0 0 1cqw}
 @media (max-width:760px){
+ .steps,.prices{grid-template-columns:minmax(0,1fr)}
  .print{grid-template-columns:minmax(0,1fr)}
  .grid2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
  .stage{grid-template-columns:minmax(0,1fr);min-height:0;gap:26px}
@@ -260,7 +277,7 @@ details{margin-top:16px}summary{cursor:pointer;font-weight:700}
 <div class="wrap">
   <header id="top"><a class="logo" href="#/"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#e8b23a" d="M12 6C9.5 4.2 6 3.8 2.5 4.5v14c3.500-.700 7-.300 9.500 1.500 2.500-1.800 6-2.200 9.500-1.500v-14C18 3.800 14.500 4.200 12 6z"/><path stroke="#6b4e0d" stroke-width="1.300" d="M12 6v14"/></svg>Storybook</a><span id="who"></span></header>
   <main id="app"></main>
-  <footer><a href="/bible">Meet the characters</a><a href="/privacy">Privacy</a></footer>
+  <footer><nav><a href="/#/">Books</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></nav><p>© 2026 Bluebid Books · Printed on demand in the USA</p></footer>
 </div>
 <script>
 const $ = (s, el = document) => el.querySelector(s);
@@ -307,7 +324,7 @@ const post = (path, body) => api(path, { method: "POST", body: JSON.stringify(bo
 function drawTop() {
   $("#who").className = "row";
   $("#who").innerHTML = me?.user
-    ? `<a class="purse" id="purse" href="#/money" title="Your balance and history">${PURSE}${money(me.balance)}</a><button class="linkish" id="out">Sign out</button>`
+    ? `${me.admin ? `<a class="linkish" href="#/admin">Admin</a>` : ""}<a class="purse" id="purse" href="#/money" title="Your account">${PURSE}${money(me.balance)}</a><button class="linkish" id="out">Sign out</button>`
     : me === null ? `<a class="btn small" href="/auth/google">Sign in with Google</a>` : "";
   $("#out")?.addEventListener("click", async () => { await post("/auth/logout", {}); me = null; location.hash = "#/"; drawTop(); route(); });
 }
@@ -391,13 +408,24 @@ function viewHome() {
   app.innerHTML = `
     <div class="stage">
       <div class="pitch">
-        ${signedIn ? `<h1>Which story are you in next?</h1><p>Open a book and add a photo. In under a minute, you're on all 20 pages.</p>` : `<h1>A picture book with you in it.</h1>
-        <p>Open a book and add a photo. In under a minute, you're on all 20 pages. Each book costs $0.99, and a printed copy can come to your door.</p>
-        ${me === null ? `<div class="row"><a class="btn big" href="/auth/google">Sign in with Google to start</a>${catalog?.devLogin ? `<a class="btn ghost" href="/auth/dev">Dev sign-in</a>` : ""}</div>` : ""}`}
+        ${signedIn ? `<h1>Which story is next?</h1><p>Choose a book and add a photo. Your copy is ready to read in about a minute.</p>` : `<h1>Your child, the hero of the story.</h1>
+        <p>We paint your child into every page of a classic fairy tale. Read it on screen for $0.99, then order a printed paperback for the bookshelf.</p>
+        ${me === null ? `<div class="row"><a class="btn big" href="/auth/google">Get started</a>${catalog?.devLogin ? `<a class="btn ghost" href="/auth/dev">Dev sign-in</a>` : ""}</div>` : ""}`}
       </div>
       <div class="duo">${stories.map((s) => `<div class="bookwrap">${bookCard(s, signedIn ? `#/new/${s.key}` : "/auth/google")}</div>`).join("")}</div>
     </div>
-    ${signedIn ? `<section class="band"><h2>Your books</h2><div id="books" class="shelf"><p class="note">Opening your shelf</p></div></section>` : ""}`;
+    ${signedIn ? `<section class="band"><h2>Your books</h2><div id="books" class="shelf"><p class="note">Loading your books…</p></div></section>` : ""}
+    <section class="how">
+      <div class="steps">
+        <div><i>1</i><h3>Choose a story</h3><p>Jack and the Beanstalk or Little Red Riding Hood, each told in 20 fully illustrated pages.</p></div>
+        <div><i>2</i><h3>Add a photo</h3><p>One clear photo is all it takes. Add a few details for the About Me page on the back cover.</p></div>
+        <div><i>3</i><h3>Read it, then print it</h3><p>Your book is ready in about a minute. Love it? Order a printed paperback and we'll ship it to you.</p></div>
+      </div>
+      <div class="prices">
+        <div><b>$0.99</b><span>Digital book</span><small>20 illustrated pages to read online and keep as a PDF</small></div>
+        <div><b>$24.99</b><span>Printed paperback</span><small>6 × 9 in, full colour, gloss cover, US shipping included</small></div>
+      </div>
+    </section>`;
   if (stories.length && me !== undefined) setTimeout(() => document.body.classList.add("risen"), 1200);
   tiltBooks();
   app.querySelectorAll(".duo .book3d").forEach((b) => {
@@ -445,19 +473,19 @@ function viewNew(key) {
           <img id="ph" alt="" hidden>
           <input id="photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" required>
         </label>
-        <p class="note" style="max-width:26ch">One person, facing the camera, with their face well lit.</p>
+        <p class="note" style="max-width:26ch">Use a clear, well-lit photo of one person looking at the camera.</p>
         <p id="lastrow"></p>
       </div>
       <div class="rightp">
         <div class="titleline">${esc(s.title)},<br>starring <em id="starname">you</em></div>
-        <label for="name">Their name</label>
+        <label for="name">First name</label>
         <input id="name" name="name" type="text" maxlength="40" required autocomplete="off">
         <input type="hidden" id="same" name="samePhoto" value="">
         <label>Is the star a boy or a girl?</label>
         <div class="seg" role="radiogroup" aria-label="Is the star a boy or a girl?">
           ${[["he", "Boy"], ["she", "Girl"]].map(([v, l]) => `<label><input type="radio" name="pronoun" value="${v}" ${v === s.pronoun ? "checked" : ""}>${l}</label>`).join("")}
         </div>
-        <details><summary>Add to the About Me page <span class="note" style="font-weight:400">(optional)</span></summary>
+        <details><summary>About Me details for the back cover <span class="note" style="font-weight:400">(optional)</span></summary>
           <label for="age">Age</label><input id="age" name="age" type="text" maxlength="20">
           <label for="likes">Favourite thing to do</label><input id="likes" name="likes" type="text" maxlength="60">
           <label for="food">Favourite food</label><input id="food" name="food" type="text" maxlength="60">
@@ -467,9 +495,9 @@ function viewNew(key) {
         <div class="go">
           <div id="ferr"></div>
           ${s.ready ? (enough
-            ? `<button class="btn big" id="go">Make my book for $0.99</button><p class="note" style="margin-top:8px">Your balance is ${money(me.balance)}.</p>`
+            ? `<button class="btn big" id="go">Create my book · $0.99</button><p class="note" style="margin-top:8px">Your balance is ${money(me.balance)}.</p>`
             : `<p style="margin-bottom:10px">A book costs $0.99, and your balance is ${money(me.balance)}.</p><a class="btn big" href="#/money">Add money</a>`)
-            : `<p class="note">This story's pictures are still being painted. Come back in a few minutes.</p>`}
+            : `<p class="note">This story isn't available right now. Please check back in a few minutes.</p>`}
         </div>
       </div>
       ${s.cover && !CALM ? `<div class="swing" aria-hidden="true"><img src="/art/${s.cover}?thumb=1" alt=""><div></div></div>` : ""}
@@ -493,7 +521,7 @@ function viewNew(key) {
   $("#f").addEventListener("submit", async (e) => {
     e.preventDefault();
     const go = $("#go"); if (!go) return;
-    go.disabled = true; go.textContent = "Opening your book";
+    go.disabled = true; go.textContent = "Starting…";
     const fd = new FormData(e.target); fd.append("story", key);
     try {
       const { id } = await api("/api/books", { method: "POST", body: fd });
@@ -503,14 +531,14 @@ function viewNew(key) {
       $("#ferr").innerHTML = `<div class="err">${esc(err.message)}${err.status === 402 ? ` <a href="#/money" style="color:inherit;font-weight:700">Add money</a>` : ""}</div>`;
       const bad = err.field && $(`#${err.field}`, e.target);
       if (bad) { if (bad.closest("details")) bad.closest("details").open = true; bad.classList.add("bad"); bad.focus(); bad.addEventListener("input", () => bad.classList.remove("bad"), { once: true }); }
-      go.disabled = false; go.textContent = "Make my book for $0.99";
+      go.disabled = false; go.textContent = "Create my book · $0.99";
     }
   });
 }
 
 function viewBook(id) {
   if (!me?.user) return viewHome();
-  app.innerHTML = `<p class="note">Opening your book</p>`;
+  app.innerHTML = `<p class="note">Loading…</p>`;
   api(`/api/books/${id}`).then(({ book }) => {
     document.documentElement.style.setProperty("--story", COLORS[book.story]);
     setSky(storyOf(book.story)?.world, true);
@@ -545,7 +573,7 @@ function viewMaking(book) {
       <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="barw"><i id="bar" style="width:2%"></i></div>
       <div class="row note" style="justify-content:space-between"><span id="clock">0 seconds</span><span>${esc(book.title)}, starring ${esc(book.child.name)}</span></div>
       <div class="easel">
-        <div class="fresh" id="fresh">The first page is on the easel.</div>
+        <div class="fresh" id="fresh">Your first page will appear here.</div>
         <div class="slots">${Array.from({ length: 20 }, (_, i) => `<div class="slot" id="s${i + 1}">${i + 1}</div>`).join("")}</div>
         <p class="legend">Every picture is checked as it's painted. The number on each page is the try that's on it, out of ${MAX_TRIES}. A page that fails the check is painted again; if all ${MAX_TRIES} tries have problems, the best one is kept and marked ★.</p>
       </div>
@@ -612,6 +640,14 @@ function pageHtml(book, i) {
   return `${art}<div class="words ${pl.font === "title" ? "title" : ""}" style="left:${b.left * 100}%;top:${b.top * 100}%;width:${(b.right - b.left) * 100}%;height:${(b.bottom - b.top) * 100}%;font-size:${size(pl.size)};${pl.mode === "framed" ? "background:none" : ""}">${lines}${sub}</div>`;
 }
 
+// Every page is checked after it's painted and redone if something is off, up to 3 tries.
+function qualityHtml(book) {
+  const pages = book.pages.filter((p) => !p.inside && !p.ahead);
+  const redone = pages.filter((p) => triesOf(p) > 1);
+  return `<details class="quality"><summary>Quality check</summary><p class="scores">Every illustration is reviewed as soon as it's painted, and redone if anything looks off (up to ${MAX_TRIES} tries, keeping the best). ${redone.length ? `${redone.length} ${redone.length === 1 ? "page was" : "pages were"} redone:` : "Every page passed on the first try."}</p>
+    ${redone.length ? `<ul class="scores" style="margin:6px 0 0;padding-left:20px">${redone.map((p) => `<li>${pageName(p)}: ${esc(tryText(p))}</li>`).join("")}</ul>` : ""}</details>`;
+}
+
 // The inside page, as printed: copyright and publisher, low on the page.
 function insideHtml(book) {
   const year = new Date(book.finishedAt || book.createdAt).getFullYear();
@@ -638,9 +674,9 @@ function viewSpread(book) {
   const retried = book.pages.filter((p) => (p.attempts || []).filter((x) => !x.skipped).length > 1);
   app.innerHTML = `<div class="row" style="justify-content:space-between"><h2>${esc(book.title)}, starring ${esc(book.child.name)}</h2><div class="row"><a class="btn ghost" href="#/print/${book.id}">Order a printed copy</a><a class="btn" href="/api/books/${book.id}/pdf">Download PDF</a></div></div>
     <div class="spread" id="book" tabindex="0" aria-label="The book. Use the arrow keys to turn pages."></div>
-    <div class="readbar"><p class="note">Drag a page, or use the arrow keys.</p><div class="nav"><button class="btn ghost small" id="prev">Back</button><span id="pos" class="note" style="min-width:110px;text-align:center"></span><button class="btn ghost small" id="next">Next</button></div><p class="tryline note" id="tryline" aria-live="polite"></p>
-      <details style="justify-self:end"><summary>How this book was checked</summary><p class="scores">Made in ${t.totalMs ? (t.totalMs / 1000).toFixed(0) : "?"} seconds. Every picture was analysed. ${retried.length ? `${retried.length} ${retried.length === 1 ? "page was" : "pages were"} repainted: ${retried.map((p) => `page ${p.n}`).join(", ")}.` : "Every page passed the first time."}${t.outOfTime ? ` ${t.outOfTime} kept the best try when time ran out.` : ""}${t.costUsd != null ? ` Its API calls (${t.apiCalls?.images ?? "?"} image calls, retries included, and ${t.apiCalls?.checks ?? "?"} checks) cost ${usd(t.costUsd, 3)}; the book costs you $0.99.` : ""}</p></details></div>
-    <div class="strip wide">${book.pages.map((p, n) => p.inside ? `<button data-i="${n}" aria-label="Copyright page" style="background:var(--paper);color:var(--ink);font-size:13px">©</button>` : `<button data-i="${n}" aria-label="${pageName(p)}. ${esc(tryText(p))}"><img src="${p.url}?thumb=1" alt="" loading="lazy">${triesBadge(p)}</button>`).join("")}<button data-i="${book.pages.length}" aria-label="Back cover: About Me" style="background:var(--paper);color:var(--ink);font-size:10px;line-height:1.1">About Me</button></div>`;
+    <div class="readbar"><p class="note">Drag a page or use the arrow keys.</p><div class="nav"><button class="btn ghost small" id="prev">Back</button><span id="pos" class="note" style="min-width:110px;text-align:center"></span><button class="btn ghost small" id="next">Next</button></div><span id="tryline" hidden></span>
+      <div style="justify-self:end">${qualityHtml(book)}</div></div>
+    <div class="strip wide">${book.pages.map((p, n) => p.inside ? `<button data-i="${n}" aria-label="Copyright page" style="background:var(--paper);color:var(--ink);font-size:13px">©</button>` : `<button data-i="${n}" aria-label="${pageName(p)}"><img src="${p.url}?thumb=1" alt="" loading="lazy"></button>`).join("")}<button data-i="${book.pages.length}" aria-label="Back cover: About Me" style="background:var(--paper);color:var(--ink);font-size:10px;line-height:1.1">About Me</button></div>`;
   const el = $("#book");
   const face = (n, side) => (n >= 0 && n <= last ? `<div class="side ${side}">${pageHtml(book, n)}</div>` : "");
   const state = (a) => (a === 0 ? "start" : a === maxAt ? "end" : "");
@@ -727,13 +763,11 @@ function viewReader(book) {
   app.innerHTML = `<div class="row" style="justify-content:space-between"><h2>${esc(book.title)}, starring ${esc(book.child.name)}</h2><div class="row"><a class="btn ghost" href="#/print/${book.id}">Order a printed copy</a><a class="btn" href="/api/books/${book.id}/pdf">Download PDF</a></div></div>
     <div class="reader">
       <div><div class="stack" id="stack" tabindex="0" aria-label="The book. Use the arrow keys to turn pages."></div>
-        <div class="nav"><button class="btn ghost small" id="prev">Back</button><span id="pos" class="note" style="min-width:96px;text-align:center"></span><button class="btn ghost small" id="next">Next</button></div><p class="tryline note" id="tryline" aria-live="polite"></p></div>
+        <div class="nav"><button class="btn ghost small" id="prev">Back</button><span id="pos" class="note" style="min-width:96px;text-align:center"></span><button class="btn ghost small" id="next">Next</button></div><span id="tryline" hidden></span></div>
       <div>
-        <p class="note">Drag a page, swipe, or use the arrow keys to turn it. This book stays on your shelf.</p>
-        <div class="strip">${book.pages.map((p, n) => p.inside ? `<button data-i="${n}" aria-label="Copyright page" style="background:var(--paper);color:var(--ink);font-size:13px">©</button>` : `<button data-i="${n}" aria-label="${pageName(p)}. ${esc(tryText(p))}"><img src="${p.url}?thumb=1" alt="" loading="lazy">${triesBadge(p)}</button>`).join("")}<button data-i="${book.pages.length}" aria-label="About Me" style="background:var(--paper);color:var(--ink);font-size:11px;line-height:1.1">About Me</button></div>
-        <details style="margin-top:20px"><summary>How this book was checked</summary>
-          <p class="scores">Made in ${t.totalMs ? (t.totalMs / 1000).toFixed(0) : "?"} seconds. Every picture was analysed. ${retried.length ? `${retried.length} ${retried.length === 1 ? "page was" : "pages were"} repainted: ${retried.map((p) => `page ${p.n}`).join(", ")}.` : "Every page passed the first time."}${t.outOfTime ? ` ${t.outOfTime} kept the best try when time ran out.` : ""}${t.costUsd != null ? ` Its API calls (${t.apiCalls?.images ?? "?"} image calls, retries included, and ${t.apiCalls?.checks ?? "?"} checks) cost ${usd(t.costUsd, 3)}; the book costs you $0.99.` : ""}</p>
-        </details>
+        <p class="note">Swipe, drag a page or use the arrow keys to turn the page. Your book stays on your shelf, ready to read again.</p>
+        <div class="strip">${book.pages.map((p, n) => p.inside ? `<button data-i="${n}" aria-label="Copyright page" style="background:var(--paper);color:var(--ink);font-size:13px">©</button>` : `<button data-i="${n}" aria-label="${pageName(p)}"><img src="${p.url}?thumb=1" alt="" loading="lazy"></button>`).join("")}<button data-i="${book.pages.length}" aria-label="About Me" style="background:var(--paper);color:var(--ink);font-size:11px;line-height:1.1">About Me</button></div>
+        <div style="margin-top:20px">${qualityHtml(book)}</div>
       </div>
     </div>`;
   const stack = $("#stack");
@@ -810,41 +844,25 @@ function viewReader(book) {
   book.pages.forEach((p) => { if (p.url) new Image().src = p.url; });
 }
 
-// What a book costs us to make, against the $0.99 it costs you. Every OpenAI call
-// is logged with its tokens and priced (see lib/cost.js).
-function costCard(c) {
-  if (!c) return "";
-  if (!c.books) return `<div class="paper onpaper cost" style="grid-column:1/-1"><h3>What a book costs to make</h3><p class="note">Every API call is logged and priced. The average appears here after the first book.</p></div>`;
-  const p = c.parts, tot = p.firstTries + p.retries + p.checks || 1, margin = c.price - c.avg;
-  const seg = (v, col) => `<i style="width:${(v / tot) * 100}%;background:${col}"></i>`;
-  return `<div class="paper onpaper cost" style="grid-column:1/-1">
-    <h3>What a book costs to make</h3>
-    <div class="vs"><b>${usd(c.avg, 3)}</b><span>average API cost per book, over ${c.books} ${c.books === 1 ? "book" : "books"}</span><span class="note">You pay <b style="font:inherit;color:var(--ink)">${usd(c.price)}</b>: ${margin >= 0 ? `${usd(margin, 3)} left over per book` : `${usd(-margin, 3)} short per book`}.</span></div>
-    <div class="bar" role="img" aria-label="Average cost split: first tries ${usd(p.firstTries, 3)}, retries ${usd(p.retries, 3)}, checks ${usd(p.checks, 3)}">${seg(p.firstTries, "#2f8a57")}${seg(p.retries, "#e8b23a")}${seg(p.checks, "#5b6fb5")}</div>
-    <div class="key"><span style="--c:#2f8a57">Painting you in, first tries: ${usd(p.firstTries, 3)}</span><span style="--c:#e8b23a">Retries: ${usd(p.retries, 3)} (${c.calls.retries.toFixed(1)} a book)</span><span style="--c:#5b6fb5">Analysis checks: ${usd(p.checks, 3)} (${c.calls.checks.toFixed(0)} a book)</span></div>
-    <p class="note" style="margin-top:10px">Cheapest book ${usd(c.min, 3)}, dearest ${usd(c.max, 3)}. ${c.art.calls ? `Painting both stories' scenes and characters ahead of time cost ${usd(c.art.usd)} once, shared by every book. ` : ""}Priced from token counts at OpenAI's published rates (${esc(c.models.pages)} for pictures, ${esc(c.models.checks)} for checks), checked ${esc(c.pricesChecked)}.</p>
-  </div>`;
-}
-
 async function viewMoney(flash) {
   if (!me?.user) return viewHome();
   setSky(catalog?.stories[0]?.world, true);
   app.innerHTML = `<p class="note">Opening your account</p>`;
   try {
-    const [w, cost, { orders }] = await Promise.all([api("/api/wallet"), api("/api/costs").catch(() => null), api("/api/orders").catch(() => ({ orders: [] }))]);
+    const [w, { orders }] = await Promise.all([api("/api/wallet"), api("/api/orders").catch(() => ({ orders: [] }))]);
     me.balance = w.balance; drawTop();
     const kindLabel = { deposit: "Added", book: "Book", book_refund: "Book not charged", refund: "Refund", refund_reversed: "Refund reversed", print: "Printed copy", print_refund: "Printed copy refunded" };
-    app.innerHTML = `<h2>Your purse</h2>${flash || ""}
+    app.innerHTML = `<h2>Your account</h2>${flash || ""}
       <div class="money">
         <div class="paper onpaper">
           <div class="bignum">${money(w.balance)}</div>
-          <p class="note">${w.balance >= w.bookCents ? `Enough for ${Math.floor(w.balance / w.bookCents)} ${Math.floor(w.balance / w.bookCents) === 1 ? "book" : "books"}, at $0.99 each.` : "A book costs $0.99."}</p>
+          <p class="note">${w.balance >= w.bookCents ? `Available balance. A digital book is $0.99 and a printed copy $${((me.printCents || 2499) / 100).toFixed(2)}.` : "A book costs $0.99."}</p>
           <h3 style="margin-top:24px">Add money</h3>
           <div class="row" style="margin-top:10px">
             ${[500, 1000, 2500].map((c) => `<button class="btn ghost" data-fund="${c}">${money(c)}</button>`).join("")}
           </div>
           <form id="other" class="row" style="margin-top:10px"><input type="number" id="amt" min="1" max="100" step="1" placeholder="Other, in dollars" aria-label="Other amount in dollars" style="flex:1;min-width:130px"><button class="btn ghost">Add</button></form>
-          <p class="note" style="margin-top:12px">This is Stripe's sandbox, so no real money moves. On Stripe's page, pay with card 4242 4242 4242 4242, any future date, and any CVC.</p>
+          <p class="note" style="margin-top:12px">Payments are handled securely by Stripe. Your card details never reach our servers.</p>
           <div id="merr"></div>
           <h3 style="margin-top:26px">Get a refund</h3>
           ${w.payments.length ? w.payments.map((p) => {
@@ -865,7 +883,6 @@ async function viewMoney(flash) {
             ${w.ledger.map((l) => `<tr><td>${whenLines(l.at)}</td><td><b>${kindLabel[l.kind] || esc(l.kind)}</b><br><span class="note">${l.bookId ? `<a href="#/book/${l.bookId}">${esc(l.cause)}</a>` : `${esc(l.cause)}${/^book/.test(l.kind) ? " (deleted from your shelf)" : ""}`}</span></td><td class="num ${l.cents > 0 ? "plus" : ""}">${l.cents > 0 ? "+" : "-"}${money(l.cents)}</td><td class="num">${money(l.balanceAfter)}</td></tr>`).join("")}
           </tbody></table></div>` : `<p class="note" style="margin-top:8px">Every credit and debit appears here, with what caused it. Add money to start.</p>`}
         </div>
-        ${costCard(cost)}
         ${orders.length ? `<div class="paper onpaper" style="grid-column:1/-1"><h3>Printed copies</h3>${orders.map((o) => orderHtml(o).replace(`<b>Order #${o.id}`, `<b><a href="#/print/${o.bookId}">${esc(o.title)}</a> · Order #${o.id}`)).join("")}</div>` : ""}
       </div>`;
     const fund = async (cents) => {
@@ -895,7 +912,7 @@ async function viewMoney(flash) {
 // A printed copy: check the PDF and approve it, then the address, then the price,
 // then the order. Nothing goes to the printer before the approval.
 const LULU_STATUS = {
-  CREATED: ["Received by the printer", ""], UNPAID: ["Received, waiting for the printer's payment step (sandbox)", ""],
+  CREATED: ["Received by the printer", ""], UNPAID: ["Received by the printer", ""],
   PAYMENT_IN_PROGRESS: ["Being paid for at the printer", ""], PRODUCTION_DELAYED: ["Queued: printing starts within the hour", ""],
   PRODUCTION_READY: ["Ready to print", "good"], IN_PRODUCTION: ["Printing", "good"], SHIPPED: ["Shipped", "good"],
   REJECTED: ["The printer rejected the files, money back", "bad"], CANCELED: ["Canceled, money back", "bad"], ERROR: ["Problem at the printer", "bad"],
@@ -905,17 +922,17 @@ function orderHtml(o) {
   const [label, tone] = o.status === "failed" ? ["Not placed, money back", "bad"] : o.status === "canceled" ? ["Canceled, money back", "bad"] : LULU_STATUS[o.luluStatus] || [o.luluStatus || o.status, ""];
   const a = o.address || {};
   return `<div class="orderline"><div class="row" style="justify-content:space-between"><b>Order #${o.id} · ${money(o.price)}</b><span class="pill ${tone}">${esc(label)}</span></div>
-    <p class="note">${when(o.createdAt)} · to ${esc(a.name)}, ${esc(a.city)}, ${esc(a.state)} ${esc(a.zip)}${o.luluJobId ? ` · Lulu print job ${esc(o.luluJobId)}` : ""}</p>
-    ${o.luluMessage ? `<p class="note">${esc(o.luluMessage)}</p>` : ""}${o.error ? `<p class="note">${esc(o.error)}</p>` : ""}
+    <p class="note">${when(o.createdAt)} · to ${esc(a.name)}, ${esc(a.city)}, ${esc(a.state)} ${esc(a.zip)}${o.luluJobId ? ` · Ref. ${esc(o.luluJobId)}` : ""}</p>
+    ${o.error ? `<p class="note">${esc(o.error)}</p>` : ""}
     ${o.tracking?.urls?.length ? `<p><a href="${esc(o.tracking.urls[0])}" target="_blank" rel="noopener">Track the parcel</a></p>` : ""}
     ${o.canCancel ? `<button class="linkish" data-cancel="${o.id}">Cancel this order and get the money back</button>` : ""}</div>`;
 }
 
 async function viewPrint(id) {
   if (!me?.user) return viewHome();
-  app.innerHTML = `<p class="note">Opening your book</p>`;
-  let book, info, costs;
-  try { [{ book }, info, costs] = await Promise.all([api(`/api/books/${id}`), api(`/api/books/${id}/print`), api("/api/costs").catch(() => null)]); }
+  app.innerHTML = `<p class="note">Loading…</p>`;
+  let book, info;
+  try { [{ book }, info] = await Promise.all([api(`/api/books/${id}`), api(`/api/books/${id}/print`)]); }
   catch (e) { app.innerHTML = `<div class="err">${esc(e.message)}</div>`; return; }
   document.documentElement.style.setProperty("--story", COLORS[book.story]);
   setSky(storyOf(book.story)?.world, true);
@@ -926,7 +943,7 @@ async function viewPrint(id) {
     <div class="print">
       <div class="paper onpaper" id="s1">
         <div class="step ${info.approval ? "done" : ""}"><i>${info.approval ? "✓" : "1"}</i><h3>Check every page</h3></div>
-        <p class="note">This is exactly what gets printed. Page through all 22 pages: the cover, the copyright page, the story and the About Me on the back.</p>
+        <p class="note">This is exactly what we'll print. Take a moment to look through all 22 pages: the front cover, the copyright page, the story and the About Me on the back.</p>
         <iframe class="pdfview" src="${pdf}?inline=1#view=FitH" title="The book's PDF"></iframe>
         <p class="note"><a href="${pdf}?inline=1" target="_blank" rel="noopener">Open the PDF in a new tab</a> · <a href="${pdf}">Download it</a></p>
         <ul class="prints note">
@@ -937,8 +954,8 @@ async function viewPrint(id) {
           <li><b>The book:</b> ${esc(info.product)}</li>
         </ul>
         <div id="approveBox">${info.approval
-          ? `<div class="ok">You approved this book on ${when(info.approval.approvedAt)}. This exact version is the one that prints.</div>`
-          : `<label class="check"><input type="checkbox" id="seen"> <span>I've looked at every page. The name, the pictures and the About Me are right, and I'm happy for this to be printed.</span></label>
+          ? `<div class="ok">Approved on ${when(info.approval.approvedAt)}. This is the version we'll print.</div>`
+          : `<label class="check"><input type="checkbox" id="seen"> <span>I've checked every page. The name, the pictures and the About Me details are correct, and the book is ready to print.</span></label>
              <button class="btn" id="approve" disabled>Approve for printing</button>`}</div>
         <div id="aerr"></div>
       </div>
@@ -956,7 +973,7 @@ async function viewPrint(id) {
             </div>
             <label for="a_phone">Phone <small>for the carrier, only if there's a delivery problem</small></label><input type="text" id="a_phone" maxlength="20" inputmode="tel" autocomplete="tel">
             <label for="a_email">Email <small>for shipping updates</small></label><input type="text" id="a_email" maxlength="80" autocomplete="email" value="${esc(info.email || "")}">
-            <p class="note" style="margin-top:8px">US addresses only for now.</p>
+            <p class="note" style="margin-top:8px">We currently ship within the United States.</p>
             <button class="btn" id="quote" style="margin-top:14px">See the price</button>
           </form>
           <div id="qerr"></div>
@@ -965,7 +982,7 @@ async function viewPrint(id) {
           <div class="step"><i>3</i><h3>Place the order</h3></div>
           <div id="priceBox"><p class="note">A printed copy is ${money(info.price)}, shipping included. You'll see the full price after the address.</p></div>
           <div id="oerr"></div>
-          <p class="sandbox">Printing runs in Lulu's sandbox and payment in Stripe's: the order is real to the app, but nothing is printed or shipped and no real money moves.</p>
+          <p class="note" style="margin-top:10px">Printed and bound on demand, then shipped by standard mail, usually within 1–2 weeks.</p>
         </div>
       </div>
     </div>
@@ -992,7 +1009,7 @@ async function viewPrint(id) {
       $("#approve").disabled = true; $("#approve").textContent = "Approving";
       try {
         const r = await post(`/api/books/${id}/approve`, { hash: info.hash });
-        $("#approveBox").innerHTML = `<div class="ok">Approved. This exact version is the one that prints.</div>`;
+        $("#approveBox").innerHTML = `<div class="ok">Approved. This is the version we'll print.</div>`;
         $("#s1 .step").classList.add("done"); $("#s1 .step i").textContent = "✓";
         info.approval = { approvedAt: r.approvedAt };
         unlockAddress(); $("#a_street1").focus();
@@ -1003,25 +1020,13 @@ async function viewPrint(id) {
   $("#addr").onsubmit = async (e) => {
     e.preventDefault();
     $("#qerr").innerHTML = ""; const btn = $("#quote");
-    btn.disabled = true; btn.textContent = "Asking the printer";
+    btn.disabled = true; btn.textContent = "Getting your price…";
     try {
       quoted = await post(`/api/books/${id}/quote`, { address: address() });
-      const q = quoted.quote, gen = costs?.avg || 0;
       const enough = me.balance >= quoted.price;
       $("#s3").classList.remove("locked");
       $("#priceBox").innerHTML = `<div class="vs" style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><b style="font:700 40px/1 Fraunces,Georgia,serif">${money(quoted.price)}</b><span>for one printed copy, shipped by standard mail to ${esc(quoted.address.city)}, ${esc(quoted.address.state)}</span></div>
-        <p class="note" style="margin-top:6px">Paid from your balance (${money(me.balance)}). ${quoted.pageCount}-page interior plus the cover, ${esc(info.product)}.</p>
-        <details style="margin-top:12px"><summary>Where the money goes</summary>
-          <table class="table math" style="margin-top:8px"><tbody>
-            <tr><td>Printing the book (Lulu)</td><td class="num">${usd(q.book)}</td></tr>
-            <tr><td>Shipping to this address</td><td class="num">${usd(q.shipping)}</td></tr>
-            ${q.fulfillment ? `<tr><td>Lulu's handling fee</td><td class="num">${usd(q.fulfillment)}</td></tr>` : ""}${q.fees ? `<tr><td>Other Lulu fees</td><td class="num">${usd(q.fees)}</td></tr>` : ""}
-            <tr><td>Sales tax Lulu charges us</td><td class="num">${usd(q.tax)}</td></tr>
-            <tr><td>Stripe's fee on the money coming in (2.9% + $0.30)</td><td class="num">${usd(quoted.stripe)}</td></tr>
-            <tr class="sum"><td>What this copy costs us</td><td class="num">${usd(q.total + quoted.stripe)}</td></tr>
-            <tr><td>You pay</td><td class="num">${money(quoted.price)}</td></tr>
-            <tr class="sum"><td>Our margin on the printed copy</td><td class="num">${usd(quoted.margin)} (${Math.round((quoted.margin / (quoted.price / 100)) * 100)}%)</td></tr>
-          </tbody></table>${gen ? `<p class="note">Painting the book itself cost about ${usd(gen)} in API calls; the $0.99 you already paid covers that.</p>` : ""}${q.mock ? `<p class="note">Sample figures: this server has no Lulu keys.</p>` : `<p class="note">Live quote from Lulu's print-job cost calculator.</p>`}</details>
+        <p class="note" style="margin-top:6px">Paid from your balance (${money(me.balance)}). ${esc(info.product)}.</p>
         <div style="margin-top:16px">${enough ? `<button class="btn big" id="place">Place order for ${money(quoted.price)}</button>` : `<p style="margin-bottom:10px">Your balance is ${money(me.balance)}, so add money first. Nothing has been charged.</p><a class="btn" href="#/money">Add money</a>`}</div>`;
       $("#place")?.addEventListener("click", place);
       $("#s3").scrollIntoView({ behavior: CALM ? "auto" : "smooth", block: "center" });
@@ -1030,17 +1035,76 @@ async function viewPrint(id) {
   };
 
   async function place() {
-    const b = $("#place"); b.disabled = true; b.textContent = "Sending to the printer";
+    const b = $("#place"); b.disabled = true; b.textContent = "Placing your order…";
     $("#oerr").innerHTML = "";
     try {
       const o = await post(`/api/books/${id}/orders`, { address: address(), price: quoted.price });
       await refreshMe();
-      $("#priceBox").innerHTML = `<div class="ok"><b>Order #${o.id} placed.</b> ${money(o.price)} came out of your balance, and Lulu has print job ${esc(o.luluJobId || "")}. Its status is below.</div>`;
+      $("#priceBox").innerHTML = `<div class="ok"><b>Thank you! Order #${o.id} is placed.</b> ${money(o.price)} was charged to your balance. You'll find the order's progress below.</div>`;
       const list = await api(`/api/books/${id}/print`);
       $("#orders").innerHTML = list.orders.map(orderHtml).join(""); bindCancel();
       dropCoins();
     } catch (err) { mark(err, "#oerr"); b.disabled = false; b.textContent = `Place order for ${money(quoted.price)}`; await refreshMe(); }
   }
+}
+
+// The owner's page: money in and out, what books and printed copies cost, every order.
+async function viewAdmin() {
+  if (!me?.admin) return viewHome();
+  setSky(catalog?.stories[0]?.world, true);
+  app.innerHTML = `<p class="note">Loading…</p>`;
+  let a;
+  try { a = await api("/api/admin/summary"); } catch (e) { app.innerHTML = `<div class="err">${esc(e.message)}</div>`; return; }
+  const r = a.revenue, c = a.costs, sold = r.books + r.prints;
+  const avgLulu = a.orders.filter((o) => o.status === "sent" && o.quote).map((o) => Number(o.quote.total));
+  const lulu = avgLulu.length ? avgLulu.reduce((x, y) => x + y, 0) / avgLulu.length : null;
+  const stripe = (cents) => cents * 0.029 / 100 + 0.30;
+  const bookMargin = 0.99 - c.avg - stripe(99), printMargin = lulu != null ? a.pricing.print / 100 - lulu - stripe(a.pricing.print) : null;
+  const statusOf = (o) => (o.status === "failed" ? "Not placed" : o.status === "canceled" ? "Canceled" : (LULU_STATUS[o.luluStatus] || [o.luluStatus])[0]);
+  app.innerHTML = `<h2>Admin</h2><p class="note">Visible only to admin accounts.</p>
+    <div class="money admin">
+      <div class="paper onpaper" style="grid-column:1/-1"><h3>Money</h3>
+        <div class="stat">
+          <div><b>${money(r.deposits)}</b><span>Added by customers (${r.depositCount} payments)</span></div>
+          <div><b>${money(r.refundsToCards)}</b><span>Refunded to cards</span></div>
+          <div><b>${money(r.books)}</b><span>Digital books (${r.booksSold})</span></div>
+          <div><b>${money(r.prints)}</b><span>Printed copies (${r.printsSold})</span></div>
+          <div><b>${money(r.luluCost)}</b><span>Owed to Lulu for those copies</span></div>
+          <div><b>${money(r.stripeFees)}</b><span>Stripe fees (est. 2.9% + 30¢)</span></div>
+          <div><b>${usd(c.avg * c.books)}</b><span>API spend on ${c.books} books</span></div>
+          <div><b>${usd(sold / 100 - r.luluCost / 100 - r.stripeFees / 100 - c.avg * c.books)}</b><span>Profit on sales so far</span></div>
+        </div>
+        <p class="note" style="margin-top:10px">${a.counts.users} accounts, ${a.counts.books} finished books. Stripe and Lulu run in sandbox / test mode.</p>
+      </div>
+      <div class="paper onpaper"><h3>Unit economics</h3>
+        <table class="table math" style="margin-top:8px"><tbody>
+          <tr class="sum"><td>Digital book</td><td class="num">$0.99</td></tr>
+          <tr><td>Average API cost per book (${c.books} books)</td><td class="num">${usd(c.avg, 3)}</td></tr>
+          <tr><td>First tries / retries / checks</td><td class="num">${usd(c.parts.firstTries, 3)} / ${usd(c.parts.retries, 3)} / ${usd(c.parts.checks, 3)}</td></tr>
+          <tr><td>Stripe on $0.99 alone</td><td class="num">${usd(stripe(99))}</td></tr>
+          <tr><td>Margin</td><td class="num">${usd(bookMargin)}</td></tr>
+          <tr class="sum"><td>Printed copy</td><td class="num">${money(a.pricing.print)}</td></tr>
+          <tr><td>Lulu: print, ship, fee, tax (avg of orders)</td><td class="num">${lulu != null ? usd(lulu) : "no orders yet"}</td></tr>
+          <tr><td>Stripe on ${money(a.pricing.print)}</td><td class="num">${usd(stripe(a.pricing.print))}</td></tr>
+          <tr><td>Margin</td><td class="num">${printMargin != null ? `${usd(printMargin)} (${Math.round((printMargin / (a.pricing.print / 100)) * 100)}%)` : "-"}</td></tr>
+        </tbody></table>
+        <p class="note" style="margin-top:8px">Cheapest book ${usd(c.min, 3)}, dearest ${usd(c.max, 3)}. Painting the shared scenes cost ${usd(c.art.usd)} once. Models: ${esc(c.models.pages)} (pictures), ${esc(c.models.checks)} (checks); prices checked ${esc(c.pricesChecked)}.</p>
+      </div>
+      <div class="paper onpaper"><h3>Printer</h3>
+        <p class="note">${esc(a.printer.product)}<br>SKU ${esc(a.printer.pod)} · ${esc(a.printer.base)}${a.printer.configured ? "" : " · not configured"}</p>
+        <p style="margin-top:12px"><a href="/bible" target="_blank" rel="noopener">Character bible and page art</a></p>
+      </div>
+      <div class="paper onpaper" style="grid-column:1/-1"><h3>Print orders</h3>
+        ${a.orders.length ? `<div class="tablewrap"><table class="table"><thead><tr><th>Order</th><th>Customer</th><th>Status</th><th class="num">Price</th><th class="num">Lulu</th><th class="num">Stripe</th><th class="num">Margin</th></tr></thead><tbody>
+          ${a.orders.map((o) => `<tr><td>#${o.id}<br><span class="note">${when(o.createdAt)}${o.luluJobId ? ` · Lulu ${esc(o.luluJobId)}` : ""}</span></td><td>${esc(o.email)}<br><span class="note">${esc(o.title)}</span></td><td>${esc(statusOf(o))}${o.luluMessage ? `<br><span class="note">${esc(o.luluMessage)}</span>` : ""}</td><td class="num">${money(o.price)}</td><td class="num">${o.quote ? usd(o.quote.total) : "-"}</td><td class="num">${usd(o.stripe)}</td><td class="num">${o.margin != null ? usd(o.margin) : "-"}</td></tr>`).join("")}
+        </tbody></table></div>` : `<p class="note">No orders yet.</p>`}
+      </div>
+      <div class="paper onpaper" style="grid-column:1/-1"><h3>Latest books</h3>
+        <div class="tablewrap"><table class="table"><thead><tr><th>Book</th><th>Customer</th><th>Status</th><th class="num">Time</th><th class="num">API cost</th><th>Pages redone (tries)</th></tr></thead><tbody>
+          ${a.books.map((b) => `<tr><td>#${b.id} ${b.story === "red" ? "Red" : "Jack"}<br><span class="note">${esc(b.name)} · ${when(b.createdAt)}</span></td><td>${esc(b.email)}</td><td>${esc(b.status)}</td><td class="num">${b.seconds != null ? `${b.seconds} s` : "-"}</td><td class="num">${b.usd != null ? usd(b.usd, 3) : "-"}</td><td>${b.retried.length ? b.retried.map((p) => `p${p.n} (${p.tries})`).join(", ") : "none"}</td></tr>`).join("")}
+        </tbody></table></div>
+      </div>
+    </div>`;
 }
 
 function route() {
@@ -1052,6 +1116,7 @@ function route() {
   if (a === "book") return viewBook(+b);
   if (a === "money") return viewMoney();
   if (a === "print") return viewPrint(+b);
+  if (a === "admin") return viewAdmin();
   viewHome();
 }
 addEventListener("hashchange", () => swap(route));

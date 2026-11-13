@@ -6,7 +6,7 @@ import sharp from "sharp";
 import { createRequire } from "node:module";
 import { log, httpLog } from "./lib/log.js";
 import * as db from "./lib/db.js";
-import { setupAuth, requireUser, DEV_LOGIN } from "./lib/auth.js";
+import { setupAuth, requireUser, requireAdmin, isAdmin, DEV_LOGIN } from "./lib/auth.js";
 import { STORIES } from "./lib/stories.js";
 import { normalizePhoto, makeThumb, MOCK, BOOK_MODEL } from "./lib/images.js";
 import { CHECK_MODEL, PASS_SCORE } from "./lib/vision.js";
@@ -45,6 +45,7 @@ for (const [pkg, subset] of [["andika", "latin"], ["fraunces", "latin"], ["noto-
 app.use(express.static("public", { index: "index.html", maxAge: 0, setHeaders: (res) => res.setHeader("Cache-Control", "no-cache") }));
 app.get("/bible", (_req, res) => res.sendFile(path.resolve("public/bible.html")));
 app.get("/privacy", (_req, res) => res.sendFile(path.resolve("public/privacy.html")));
+app.get("/terms", (_req, res) => res.sendFile(path.resolve("public/terms.html")));
 
 // The stories, for the page itself. Cover art comes straight from memory.
 app.get("/catalog.json", (_req, res) => {
@@ -113,7 +114,7 @@ app.use(["/api", "/img"], (req, res, next) => (req.path === "/me" ? next() : req
 
 app.get("/api/me", route(async (req) => {
   if (!req.user) return { user: null };
-  return { user: req.user, balance: await wallet.balance(req.user.id), bookCents: wallet.BOOK_CENTS };
+  return { user: req.user, balance: await wallet.balance(req.user.id), bookCents: wallet.BOOK_CENTS, printCents: orders.PRINT_CENTS, admin: isAdmin(req.user) };
 }));
 
 app.get("/img/:id(\\d+)", async (req, res) => {
@@ -188,7 +189,7 @@ const bookOut = (b) => ({
 app.get("/api/books", route(async (req) => ({ books: (await db.listBooks(req.user.id)).map(bookOut) })));
 
 // What a book costs to make, next to what we charge for it.
-app.get("/api/costs", route(async (req) => ({ price: wallet.BOOK_CENTS / 100, pricesChecked: PRICES_CHECKED, models: { pages: BOOK_MODEL, checks: CHECK_MODEL }, ...(await db.costSummary(req.user.id)) })));
+app.get("/api/costs", requireAdmin, route(async (req) => ({ price: wallet.BOOK_CENTS / 100, pricesChecked: PRICES_CHECKED, models: { pages: BOOK_MODEL, checks: CHECK_MODEL }, ...(await db.costSummary(req.user.id)) })));
 
 app.post("/api/books", upload.single("photo"), route(async (req) => {
   const story = STORIES[req.body.story];
@@ -293,16 +294,18 @@ const titleOf = (b) => `${STORIES[b.story]?.title}, starring ${b.child?.name}`;
 app.get("/api/books/:id/print", route(async (req) => {
   const b = await ownBook(req);
   return {
-    ready: b.status === "done", configured: lulu.configured(), sandbox: true, mock: lulu.MOCK, hash: orders.contentHash(b),
-    approval: await orders.approval(req.user.id, b), price: orders.PRINT_CENTS, product: lulu.POD_LABEL, pod: lulu.POD,
-    shipping: lulu.SHIPPING, publisher: PUBLISHER, email: req.user.email, orders: await orders.listOrders(req.user.id, b.id),
+    ready: b.status === "done", configured: lulu.configured(), hash: orders.contentHash(b),
+    approval: await orders.approval(req.user.id, b), price: orders.PRINT_CENTS, product: lulu.POD_LABEL,
+    publisher: PUBLISHER, email: req.user.email, orders: await orders.listOrders(req.user.id, b.id),
   };
 }));
 app.post("/api/books/:id/approve", route(async (req) => orders.approve(req.user.id, await ownBook(req), req.body?.hash ? String(req.body.hash) : null)));
 app.post("/api/books/:id/quote", route(async (req) => {
   const b = await ownBook(req);
   const address = orders.cleanAddress({ email: req.user.email, ...(req.body?.address || {}) });
-  return { address, ...(await orders.priceFor({ book: b, address, shipping: req.body?.shipping })) };
+  const p = await orders.priceFor({ book: b, address, shipping: req.body?.shipping });
+  // What it costs us and the margin are the owner's business, not the customer's.
+  return isAdmin(req.user) ? { address, ...p } : { address, price: p.price, pageCount: p.pageCount };
 }));
 app.post("/api/books/:id/orders", route(async (req) => {
   const b = await ownBook(req);
@@ -312,8 +315,13 @@ app.post("/api/books/:id/orders", route(async (req) => {
 app.get("/api/orders", route(async (req) => ({ orders: await orders.listOrders(req.user.id) })));
 app.get("/api/orders/:id", route(async (req) => ({ order: await orders.getOrder(req.user.id, Number(req.params.id)) })));
 app.post("/api/orders/:id/cancel", route(async (req) => ({ order: await orders.cancelOrder(req.user.id, Number(req.params.id)) })));
-// Setup check: can this server reach Lulu's sandbox with its keys?
-app.get("/api/print/ping", route(async () => lulu.ping()));
+// The owner's pages ------------------------------------------------------------
+app.get("/api/print/ping", requireAdmin, route(async () => lulu.ping()));
+app.get("/api/admin/summary", requireAdmin, route(async () => ({
+  ...(await orders.adminSummary()),
+  costs: { price: wallet.BOOK_CENTS / 100, pricesChecked: PRICES_CHECKED, models: { pages: BOOK_MODEL, checks: CHECK_MODEL }, ...(await db.costSummary(null)) },
+  printer: { base: lulu.LULU_BASE, pod: lulu.POD, product: lulu.POD_LABEL, configured: lulu.configured(), mock: lulu.MOCK },
+})));
 
 app.use((err, _req, res, _next) => sendError(res, err));
 
