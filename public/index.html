@@ -86,14 +86,52 @@ header{display:flex;align-items:center;gap:16px;padding:18px 0}
 .onpaper .note,.paper .note,.open .note{color:var(--soft)}
 .err{background:#fbe6e6;color:#7c1a21;border-radius:8px;padding:10px 14px;margin:12px 0}
 .ok{background:#e4f2e8;color:#1b5234;border-radius:8px;padding:10px 14px;margin:12px 0}
-footer{padding:40px 0 44px;display:grid;justify-items:center;gap:14px}
-footer nav{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
-footer p{color:var(--mist);font-size:14px}
-footer a{display:inline-block;padding:10px 20px;border-radius:999px;background:rgba(13,18,50,.68);backdrop-filter:blur(10px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);text-decoration:none;font-weight:700;font-size:15px;transition:background .15s,transform .15s}
-footer a:hover{background:rgba(43,52,104,.9);transform:translateY(-1px)}
 .hero{padding:16px 0 4px;display:grid;gap:14px}
 .hero p{max-width:48ch;font-size:19px;color:var(--mist)}
 
+/* Landing sections */
+.lp{padding:64px 0 0;text-align:center}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.lp h2{font-size:clamp(28px,3.8vw,44px);letter-spacing:-.01em}
+.lpsub{color:var(--mist);max-width:52ch;margin:12px auto 0}
+.gallery{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:clamp(8px,1.6vw,18px);margin-top:34px;padding:0 6px}
+.shot{position:relative;padding:0;border:0;background:var(--paper);border-radius:8px;overflow:hidden;aspect-ratio:2/3;box-shadow:0 14px 30px rgba(3,6,24,.55);transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
+.shot:nth-child(odd){transform:rotate(-2.2deg) translateY(8px)}.shot:nth-child(even){transform:rotate(1.8deg)}
+.shot:hover,.shot:focus-visible{transform:translateY(-8px) scale(1.06);z-index:2;box-shadow:0 24px 44px rgba(3,6,24,.7)}
+.shot img{width:100%;height:100%;object-fit:cover}
+.shot span{position:absolute;left:0;right:0;bottom:0;padding:22px 8px 8px;font-size:12px;font-weight:700;color:#fff;background:linear-gradient(transparent,rgba(8,12,38,.85));opacity:0;transition:opacity .25s}
+.shot:hover span,.shot:focus-visible span{opacity:1}
+@media (max-width:700px){.gallery{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.plans{display:grid;grid-template-columns:repeat(2,minmax(0,360px));justify-content:center;gap:22px;margin-top:34px;text-align:left}
+.plan{position:relative;display:flex;flex-direction:column;gap:6px;background:rgba(13,18,50,.72);backdrop-filter:blur(8px);border-radius:18px;padding:28px 28px 26px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.plan.best{background:var(--paper);color:var(--ink);box-shadow:0 22px 50px rgba(3,6,24,.55)}
+.plan h3{font-size:22px}
+.price{font:700 46px/1.1 Fraunces,Georgia,serif;margin:4px 0 6px}
+.price small{font:400 15px Andika,system-ui,sans-serif;color:var(--soft)}
+.plan ul{list-style:none;margin:6px 0 18px;padding:0;display:grid;gap:9px;font-size:16px}
+.plan li{padding-left:28px;position:relative;line-height:1.4}
+.plan li:before{content:"";position:absolute;left:0;top:3px;width:18px;height:18px;border-radius:50%;background:var(--gold) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M5 9.4l2.6 2.6L13 6.6' fill='none' stroke='%23241a02' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/18px}
+.plan .btn{margin-top:auto;align-self:flex-start}
+.plannote{margin-top:auto;color:var(--soft);font-size:15px}
+.ribbon{position:absolute;top:18px;right:18px;background:var(--ink);color:#fff;font-size:12px;font-weight:700;letter-spacing:.05em;border-radius:999px;padding:4px 12px}
+@media (max-width:700px){.plans{grid-template-columns:minmax(0,1fr)}}
+.faq{max-width:760px;margin:30px auto 0;text-align:left;display:grid;gap:10px}
+.faq details{margin:0;background:rgba(13,18,50,.72);backdrop-filter:blur(8px);border-radius:14px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);transition:background .2s}
+.faq details[open]{background:rgba(13,18,50,.9)}
+.faq summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:14px;padding:16px 20px;font-weight:700;font-size:17px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary:after{content:"+";flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.1);color:var(--gold);font-size:20px;line-height:1;transition:transform .25s}
+.faq details[open] summary:after{transform:rotate(45deg)}
+.faq details p{padding:0 20px 18px;color:var(--mist);max-width:62ch}
+.cta{margin-top:70px;padding:48px 24px;text-align:center;display:grid;justify-items:center;gap:22px;border-radius:22px;background:radial-gradient(120% 140% at 50% 0,rgba(232,178,58,.28),transparent 60%),rgba(13,18,50,.82);box-shadow:inset 0 0 0 1px rgba(232,178,58,.35)}
+.cta h2{font-size:clamp(26px,3.6vw,40px);max-width:20ch}
+footer{margin-top:60px;padding:30px 0 40px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;border-top:1px solid rgba(255,255,255,.12)}
+footer .fbrand{display:grid;gap:2px}
+footer .fbrand b{font:700 20px Fraunces,Georgia,serif}
+footer p{color:var(--mist);font-size:14px}
+footer nav{display:flex;flex-wrap:wrap;gap:6px}
+footer a{display:inline-block;padding:8px 14px;border-radius:999px;text-decoration:none;font-weight:700;font-size:15px;color:var(--mist);transition:background .15s,color .15s}
+footer a:hover{background:rgba(255,255,255,.1);color:#fff}
 /* The stories, in their world */
 .stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(20px,4vw,60px);align-items:center;min-height:min(66vh,620px)}
 .pitch{display:grid;gap:18px;justify-items:start}
@@ -506,7 +544,7 @@ code{font-size:13px;background:#f1e8d3;border-radius:5px;padding:1px 5px}
 <div class="wrap">
   <header id="top"><a class="logo" href="#/"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#e8b23a" d="M12 6C9.5 4.2 6 3.8 2.5 4.5v14c3.500-.700 7-.300 9.500 1.500 2.500-1.800 6-2.200 9.500-1.500v-14C18 3.800 14.500 4.200 12 6z"/><path stroke="#6b4e0d" stroke-width="1.300" d="M12 6v14"/></svg>Storybook</a><span id="who"></span></header>
   <main id="app"></main>
-  <footer><nav><a href="/#/">Books</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></nav><p>© 2026 Bluebid Books · Printed on demand in the USA</p></footer>
+  <footer><div class="fbrand"><b>Storybook</b><p>© 2026 Bluebid Books · Printed on demand in the USA</p></div><nav><a href="/#/">Books</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></nav></footer>
 </div>
 <script>
 const $ = (s, el = document) => el.querySelector(s);
@@ -576,10 +614,10 @@ function dropCoins() {
 }
 // Morph between views where the browser can.
 // Peek inside: a few real pages of a story before buying.
-function peek(key) {
+function peek(key, start = 0) {
   const s = catalog?.stories.find((x) => x.key === key);
   if (!s?.samples?.length) return;
-  let i = 0;
+  let i = Math.min(start, s.samples.length - 1);
   const box = document.createElement("div");
   box.className = "peek"; box.setAttribute("role", "dialog"); box.setAttribute("aria-modal", "true"); box.setAttribute("aria-label", `Peek inside ${s.title}`);
   box.innerHTML = `<div class="peekcard">
@@ -609,7 +647,7 @@ function peek(key) {
   s.samples.forEach((p) => { new Image().src = `/art/${p.image}`; });
 }
 document.addEventListener("click", (e) => { if (e.target.closest("[data-top]")) { e.preventDefault(); scrollTo({ top: 0, behavior: "smooth" }); }
-  const b = e.target.closest("[data-peek]"); if (b) { e.preventDefault(); peek(b.dataset.peek); } });
+  const b = e.target.closest("[data-peek]"); if (b) { e.preventDefault(); peek(b.dataset.peek, +b.dataset.at || 0); } });
 
 function swap(fn) { document.startViewTransition && !CALM ? document.startViewTransition(fn) : fn(); }
 
@@ -695,6 +733,34 @@ function viewHome() {
       <div><i>3</i><b>Read it, then keep it</b><span>Read online for $0.99, or get a printed paperback for $24.99, shipping included</span></div>
     </section>`}
     ${signedIn ? `<section class="band" id="shelf"><div class="shelfhead"><h2>Your books</h2><span id="shelfcount" class="note"></span></div><div id="books" class="shelf"><p class="note">Loading your books…</p></div></section>` : ""}
+    ${stories.some((x) => x.samples?.length) ? `<section class="lp" aria-labelledby="lp1">
+      <p class="eyebrow">A look inside</p><h2 id="lp1">Twenty painted pages, one little hero</h2>
+      <p class="lpsub">These are real pages from the books. In your copy, your child steps into every picture.</p>
+      <div class="gallery">${stories.flatMap((x) => [1, 3, 5].map((n) => x.samples?.[n] && `<button type="button" class="shot" data-peek="${x.key}" data-at="${n}" aria-label="${esc(x.title)}, page ${x.samples[n].n}"><img src="/art/${x.samples[n].image}?thumb=1" alt="" loading="lazy"><span>${esc(x.title)}</span></button>`)).filter(Boolean).join("")}</div>
+    </section>` : ""}
+    <section class="lp" aria-labelledby="lp2">
+      <p class="eyebrow">Pricing</p><h2 id="lp2">Simple, with no subscription</h2>
+      <div class="plans">
+        <div class="plan"><h3>Digital book</h3><p class="price">$0.99</p>
+          <ul><li>All 20 pages, starring your child</li><li>Their name on the cover, About Me on the back</li><li>Read it here anytime, or download the PDF</li><li>Ready in about a minute</li></ul>
+          <a class="btn ghost" href="${signedIn ? "#/" : "/auth/google"}" ${signedIn ? "data-top" : ""}>Make a book</a></div>
+        <div class="plan best"><span class="ribbon">A keepsake</span><h3>Printed copy</h3><p class="price">$24.99 <small>shipping included</small></p>
+          <ul><li>6 × 9 in paperback in full colour</li><li>Gloss cover, printed and bound just for you</li><li>You check and approve every page first</li><li>Delivered in the US, usually in 1–2 weeks</li></ul>
+          <p class="plannote">Order from any finished book.</p></div>
+      </div>
+    </section>
+    <section class="lp" aria-labelledby="lp3">
+      <p class="eyebrow">Good to know</p><h2 id="lp3">Questions parents ask</h2>
+      <div class="faq">
+        <details><summary>What kind of photo works best?</summary><p>A clear, bright photo of one face looking at the camera. A phone photo is perfect.</p></details>
+        <details><summary>How long does it take?</summary><p>About a minute. You can watch the pages appear as they're painted.</p></details>
+        <details><summary>What if the book doesn't come out right?</summary><p>If a book can't be completed, you aren't charged. Money you've added and haven't spent can be refunded to your card from your account page.</p></details>
+        <details><summary>Who can see my child's photo?</summary><p>Only you. The photo is used to illustrate your book and nothing else, and deleting a book removes its photo and pages. The details are on our <a href="/privacy">privacy page</a>.</p></details>
+        <details><summary>Can I see the printed book before paying?</summary><p>Yes. Before any order you page through the exact file we'll print and approve it, and you see the full price before you confirm.</p></details>
+        <details><summary>Where do you ship?</summary><p>Printed copies ship within the United States by standard mail, and shipping is included in the price.</p></details>
+      </div>
+    </section>
+    ${signedIn ? "" : `<section class="cta"><h2>Tonight's bedtime story could star your child.</h2><a class="btn big" href="/auth/google">Get started</a></section>`}
     `;
   if (stories.length && me !== undefined) setTimeout(() => document.body.classList.add("risen"), 1200);
   tiltBooks();
