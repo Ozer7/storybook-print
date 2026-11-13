@@ -324,8 +324,8 @@ const post = (path, body) => api(path, { method: "POST", body: JSON.stringify(bo
 function drawTop() {
   $("#who").className = "row";
   $("#who").innerHTML = me?.user
-    ? `${me.admin ? `<a class="linkish" href="#/admin">Admin</a>` : ""}<a class="purse" id="purse" href="#/money" title="Your account">${PURSE}${money(me.balance)}</a><button class="linkish" id="out">Sign out</button>`
-    : me === null ? `<a class="btn small" href="/auth/google">Sign in with Google</a>` : "";
+    ? `<a class="linkish" href="#/admin">Admin</a><a class="purse" id="purse" href="#/money" title="Your account">${PURSE}${money(me.balance)}</a><button class="linkish" id="out">Sign out</button>`
+    : me === null ? `<a class="linkish" href="#/admin">Admin</a><a class="btn small" href="/auth/google">Sign in with Google</a>` : "";
   $("#out")?.addEventListener("click", async () => { await post("/auth/logout", {}); me = null; location.hash = "#/"; drawTop(); route(); });
 }
 async function refreshMe() {
@@ -1050,9 +1050,23 @@ async function viewPrint(id) {
 
 // The owner's page: money in and out, what books and printed copies cost, every order.
 async function viewAdmin() {
-  if (!me?.admin) return viewHome();
   setSky(catalog?.stories[0]?.world, true);
   app.innerHTML = `<p class="note">Loading…</p>`;
+  const st = await api("/api/admin/status").catch(() => ({ admin: false, passwordSet: true }));
+  if (!st.admin) {
+    app.innerHTML = `<div class="paper onpaper" style="max-width:420px;margin:30px auto">
+      <h2>Admin</h2><p class="note">Enter the admin password to see sales, costs and orders.</p>
+      <form id="alogin" style="margin-top:14px"><label for="apw">Password</label><input type="password" id="apw" autocomplete="current-password" required>
+      <button class="btn" style="margin-top:14px">Unlock</button></form><div id="aerr"></div></div>`;
+    $("#apw").focus();
+    $("#alogin").onsubmit = async (e) => {
+      e.preventDefault();
+      const btn = e.target.querySelector("button"); btn.disabled = true;
+      try { await post("/api/admin/login", { password: $("#apw").value }); viewAdmin(); }
+      catch (err) { $("#aerr").innerHTML = `<div class="err">${esc(err.message)}</div>`; btn.disabled = false; $("#apw").select(); }
+    };
+    return;
+  }
   let a;
   try { a = await api("/api/admin/summary"); } catch (e) { app.innerHTML = `<div class="err">${esc(e.message)}</div>`; return; }
   const r = a.revenue, c = a.costs, sold = r.books + r.prints;
@@ -1061,7 +1075,7 @@ async function viewAdmin() {
   const stripe = (cents) => cents * 0.029 / 100 + 0.30;
   const bookMargin = 0.99 - c.avg - stripe(99), printMargin = lulu != null ? a.pricing.print / 100 - lulu - stripe(a.pricing.print) : null;
   const statusOf = (o) => (o.status === "failed" ? "Not placed" : o.status === "canceled" ? "Canceled" : (LULU_STATUS[o.luluStatus] || [o.luluStatus])[0]);
-  app.innerHTML = `<h2>Admin</h2><p class="note">Visible only to admin accounts.</p>
+  app.innerHTML = `<div class="row" style="justify-content:space-between"><h2>Admin</h2><button class="btn ghost small" id="alock">Lock</button></div>
     <div class="money admin">
       <div class="paper onpaper" style="grid-column:1/-1"><h3>Money</h3>
         <div class="stat">
@@ -1105,6 +1119,7 @@ async function viewAdmin() {
         </tbody></table></div>
       </div>
     </div>`;
+  $("#alock").onclick = async () => { await post("/api/admin/logout", {}); viewAdmin(); };
 }
 
 function route() {
@@ -1113,7 +1128,7 @@ function route() {
   const [, a, b] = location.hash.split("/");
   window.scrollTo(0, 0);
   // Signed-in pages wait for the sign-in check, so a link opened right after signing in lands where it should.
-  if (me === undefined && ["new", "book", "money", "print", "admin"].includes(a)) { app.innerHTML = `<p class="note">Loading…</p>`; return; }
+  if (me === undefined && ["new", "book", "money", "print"].includes(a)) { app.innerHTML = `<p class="note">Loading…</p>`; return; }
   if (a === "new") return viewNew(b);
   if (a === "book") return viewBook(+b);
   if (a === "money") return viewMoney();

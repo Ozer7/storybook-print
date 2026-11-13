@@ -6,7 +6,7 @@ import sharp from "sharp";
 import { createRequire } from "node:module";
 import { log, httpLog } from "./lib/log.js";
 import * as db from "./lib/db.js";
-import { setupAuth, requireUser, requireAdmin, isAdmin, DEV_LOGIN } from "./lib/auth.js";
+import { setupAuth, requireUser, requireAdmin, isAdmin, adminLogin, adminPasswordSet, DEV_LOGIN } from "./lib/auth.js";
 import { STORIES } from "./lib/stories.js";
 import { normalizePhoto, makeThumb, MOCK, BOOK_MODEL } from "./lib/images.js";
 import { CHECK_MODEL, PASS_SCORE } from "./lib/vision.js";
@@ -110,11 +110,12 @@ app.get("/print-files/:token/:kind(interior|cover).pdf", async (req, res) => {
 // ---------------------------------------------------------------------------
 setupAuth(app);
 app.use(express.json({ limit: "64kb" }));
-app.use(["/api", "/img"], (req, res, next) => (req.path === "/me" ? next() : requireUser(req, res, next)));
+// Signed-in only, except "who am I" and the admin pages (which have their own password).
+app.use(["/api", "/img"], (req, res, next) => (req.path === "/me" || req.path.startsWith("/admin") || req.path === "/costs" ? next() : requireUser(req, res, next)));
 
 app.get("/api/me", route(async (req) => {
   if (!req.user) return { user: null };
-  return { user: req.user, balance: await wallet.balance(req.user.id), bookCents: wallet.BOOK_CENTS, printCents: orders.PRINT_CENTS, admin: isAdmin(req.user) };
+  return { user: req.user, balance: await wallet.balance(req.user.id), bookCents: wallet.BOOK_CENTS, printCents: orders.PRINT_CENTS };
 }));
 
 app.get("/img/:id(\\d+)", async (req, res) => {
@@ -305,7 +306,7 @@ app.post("/api/books/:id/quote", route(async (req) => {
   const address = orders.cleanAddress({ email: req.user.email, ...(req.body?.address || {}) });
   const p = await orders.priceFor({ book: b, address, shipping: req.body?.shipping });
   // What it costs us and the margin are the owner's business, not the customer's.
-  return isAdmin(req.user) ? { address, ...p } : { address, price: p.price, pageCount: p.pageCount };
+  return isAdmin(req) ? { address, ...p } : { address, price: p.price, pageCount: p.pageCount };
 }));
 app.post("/api/books/:id/orders", route(async (req) => {
   const b = await ownBook(req);
@@ -317,6 +318,14 @@ app.get("/api/orders/:id", route(async (req) => ({ order: await orders.getOrder(
 app.post("/api/orders/:id/cancel", route(async (req) => ({ order: await orders.cancelOrder(req.user.id, Number(req.params.id)) })));
 // The owner's pages ------------------------------------------------------------
 app.get("/api/print/ping", requireAdmin, route(async () => lulu.ping()));
+app.get("/api/admin/status", (req, res) => res.json({ admin: isAdmin(req), passwordSet: adminPasswordSet() }));
+app.post("/api/admin/login", (req, res) => {
+  const r = adminLogin(req);
+  log.info({ event: r.ok ? "admin.unlocked" : "admin.refused", ip: req.ip, status: r.status }, "admin password");
+  if (!r.ok) return res.status(r.status).json({ error: r.error });
+  req.session.save(() => res.json({ admin: true }));
+});
+app.post("/api/admin/logout", (req, res) => { if (req.session) req.session.adminUnlocked = false; res.json({ admin: false }); });
 app.get("/api/admin/summary", requireAdmin, route(async () => ({
   ...(await orders.adminSummary()),
   costs: { price: wallet.BOOK_CENTS / 100, pricesChecked: PRICES_CHECKED, models: { pages: BOOK_MODEL, checks: CHECK_MODEL }, ...(await db.costSummary(null)) },

@@ -13,7 +13,7 @@ const base = `http://localhost:${PORT}`;
 const fake = await startFakeStripe(STRIPE);
 const child = spawn("node", ["server.js"], {
   stdio: ["ignore", process.env.SMOKE_LOGS ? "inherit" : "ignore", "inherit"],
-  env: { ...process.env, PORT, MOCK_IMAGES: "1", MOCK_DELAY_MS: "150", MOCK_FAIL_PAGES: "5", DEV_LOGIN: "1", PGSSL: "0", STRIPE_SECRET_KEY: "sk_test_fake", STRIPE_API_HOST: "localhost", STRIPE_API_PORT: String(STRIPE), STRIPE_API_PROTOCOL: "http", SESSION_SECRET: "x", RENDER: "", ADMIN_EMAILS: `dev${RUN}@example.com` },
+  env: { ...process.env, PORT, MOCK_IMAGES: "1", MOCK_DELAY_MS: "150", MOCK_FAIL_PAGES: "5", DEV_LOGIN: "1", PGSSL: "0", STRIPE_SECRET_KEY: "sk_test_fake", STRIPE_API_HOST: "localhost", STRIPE_API_PORT: String(STRIPE), STRIPE_API_PROTOCOL: "http", SESSION_SECRET: "x", RENDER: "", ADMIN_PASSWORD: "letmein-test" },
 });
 const done = (code) => { child.kill(); fake.server.close(); process.exit(code); };
 process.on("uncaughtException", (e) => { console.error(e); done(1); });
@@ -101,6 +101,9 @@ for (const story of ["jack", "red"]) {
   console.log(story, "book ok in", Date.now() - t, "ms, pdf", buf.length, "bytes, cost $" + b.timing.costUsd);
 }
 await new Promise((r) => setTimeout(r, 300)); // let the last cost rows land
+assert.equal((await J("/api/costs")).status, 401, "costs need the admin password");
+assert.equal((await J("/api/admin/login", { method: "POST", json: { password: "wrong" } })).status, 401, "wrong admin password refused");
+assert.equal((await J("/api/admin/login", { method: "POST", json: { password: "letmein-test" } })).status, 200, "admin password unlocks");
 const costs = (await J("/api/costs")).body; // admin only
 assert.ok(costs.books >= 2 && costs.avg > 0 && costs.price === 0.99, "average cost per book shown against $0.99");
 assert.ok(costs.parts.retries > 0, "retries costed separately");
@@ -191,9 +194,8 @@ const mine = cookie; cookie = ""; await call(`/auth/dev?u=other${Date.now()}`);
 assert.equal((await call(img)).status, 404);
 assert.equal((await call(`/api/books/${id0.id}`)).status, 404);
 assert.equal((await call(`/api/books/${globalThis.printedBook}/print`)).status, 404, "or order a print of it");
-assert.equal((await call("/api/costs")).status, 404, "costs are admin only");
-assert.equal((await call("/api/admin/summary")).status, 404, "the admin page is admin only");
-assert.equal((await J("/api/me")).body.admin, false);
+assert.equal((await call("/api/costs")).status, 401, "costs are locked for another session");
+assert.equal((await call("/api/admin/summary")).status, 401, "the admin page is locked for another session");
 cookie = mine;
 console.log("all ok");
 done(0);

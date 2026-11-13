@@ -31,7 +31,7 @@ The error names the field, and the form highlights it. Books made before this ho
 
 **A real order.** Order #1 went to Lulu's sandbox as print job 363659. Lulu downloaded both PDFs and validated them; the sandbox stops at "unpaid".
 
-**Ready for customers.** The figures below are for the owner. They're on an admin page (`/#/admin`, only for the accounts in `ADMIN_EMAILS`), along with every order, the cost of each book and the character bible. Customers see prices, their books and their orders. There are no sandbox notes, no test card number and no model names on the public pages, and there are privacy and terms pages.
+**Ready for customers.** The figures below are for the owner. They're on an admin page (`/#/admin`; the Admin link is in the header, and the page asks for a password), along with every order, the cost of each book and the character bible. Customers see prices, their books and their orders. There are no sandbox notes, no test card number and no model names on the public pages, and there are privacy and terms pages.
 
 ## Price: $24.99 for a printed copy, shipped
 

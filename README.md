@@ -14,7 +14,7 @@ A 20-page picture book starring you, in under a minute, and a real printed copy 
 - **A real book** (`lib/pdf.js`): front cover with the title "starring" the child, an inside page with the copyright notice and the publisher (Bluebid Books), the story from the next page on, and About Me on the back cover. The same drawing code makes the reader's PDF and the printer's files.
 - **Checked before it's printed** (`lib/moderate.js`): the name and About Me pass rules (letters only, no rude words, no phone numbers, emails or addresses), OpenAI's moderation endpoint, and a model asked whether the name is a real person's name. Nothing is charged until they pass.
 - **Printed and shipped** (`lib/lulu.js`, `lib/orders.js`): Lulu's Print API, sandbox only. The reader approves the PDF (tied to a hash of its exact content), enters a US address, sees a live quote, and places the order. Lulu downloads the interior (20 pages with bleed) and the one-piece cover from a private link.
-- **Owner's page** (`/#/admin`, `/api/admin/summary`): money in and out, cost per book, Lulu cost and margin per printed copy, every order and the latest books. Only accounts in `ADMIN_EMAILS` (or `ADMIN_USER_IDS`, default the first account) see it; customers never see costs, margins or model names.
+- **Owner's page** (`/#/admin`, `/api/admin/summary`): money in and out, cost per book, Lulu cost and margin per printed copy, every order and the latest books. The Admin link is in the header for everyone, and the page opens only with the password in `ADMIN_PASSWORD` (five wrong tries lock that address out for 15 minutes). Customers never see costs, margins or model names.
 - **Still there tomorrow**: images live in Postgres, and the PDF is rebuilt from them on request.
 
 ## Run it locally
