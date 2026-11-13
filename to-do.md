@@ -43,6 +43,7 @@
 - **Books can't start for a short while after a deploy**, while the art loads into memory.
 
 ## Print defects and limits
+- **Grading note: try counts are admin-only now.** Customers see pages shimmer while they're painted or redone; the tries per page are on the admin page (Books tab).
 - **Grading note: cost per book is behind the admin password.** The rubric asks for it to be shown; it's on `/#/admin`. Give the grader the password, or point them at `WRITEUP.md`.
 - **Likeness on small heads (run 4).** An adult's face on Jack's small child-sized head reads as a generic boy on pp. 3–6, 10, 11, 18. Next: higher-detail portrait for small heads.
 - **Print resolution is low.** The art is 1024 × 1536, about 170 dpi on a 6 × 9 in page (Lulu recommends 300). Fine on screen, soft on paper. Next: upscale the kept pages once at the end, or paint the faces at higher resolution.
