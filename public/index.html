@@ -117,7 +117,27 @@ body:not(.risen) .bookwrap:nth-child(2){animation-delay:.14s}
 .tiny{--w:clamp(104px,16vw,146px);--d:7px;--ry:14deg;--rx:0deg}
 .tiny .title{font-size:clamp(12px,1.35vw,15px)}
 .tiny:hover{--ry:0deg;transform:rotateX(0) rotateY(0) translateY(-6px)}
-.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:30px 26px;margin-top:20px;perspective:1100px}
+.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:22px;margin-top:18px}
+.bk{display:grid;grid-template-columns:minmax(0,1fr);min-width:0;gap:10px;background:rgba(255,255,255,.05);border-radius:14px;padding:12px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);transition:transform .2s,background .2s}
+.bk:hover{transform:translateY(-3px);background:rgba(255,255,255,.09)}
+.bkcover{position:relative;display:block;aspect-ratio:2/3;border-radius:3px 7px 7px 3px;overflow:hidden;background:#20294f;box-shadow:0 12px 22px rgba(0,0,0,.45)}
+.bkcover img{width:100%;height:100%;object-fit:cover;transition:transform .35s}
+.bk:hover .bkcover img{transform:scale(1.04)}
+.bkspine{position:absolute;left:0;top:0;bottom:0;width:9px;background:linear-gradient(90deg,rgba(0,0,0,.35),rgba(255,255,255,.12) 60%,transparent),var(--bk)}
+.bkblank{position:absolute;inset:0;display:grid;place-items:center;color:var(--mist);font-size:28px}
+.tag{position:absolute;left:10px;right:8px;bottom:8px;text-align:center;font-size:12.5px;font-weight:700;background:rgba(232,178,58,.95);color:#241a02;border-radius:999px;padding:3px 8px}
+.tag.bad{background:rgba(255,251,241,.95);color:#8b1f29}
+.bkinfo h3{font-size:19px;line-height:1.15}.bkinfo h3 a{text-decoration:none}
+.bkinfo p{font-size:14px;color:var(--mist);line-height:1.3}
+.bkinfo .bkdate{font-size:13px;opacity:.75;margin-top:2px}
+.bkact{display:flex;align-items:center;gap:6px;margin-top:auto}
+.bkact .btn.small{padding:6px 14px;margin-right:auto}
+.iconbtn{display:inline-grid;place-items:center;flex:none;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.08);border:0;color:var(--paper);text-decoration:none;cursor:pointer}
+.iconbtn:hover{background:rgba(255,255,255,.18)}
+.iconbtn.del:hover,.iconbtn.sure{background:#9b2430;color:#fff}
+.iconbtn.sure{width:auto;border-radius:999px;padding:0 12px;font-size:13px;font-weight:700}
+.shelfempty{padding:26px;text-align:center;border:1.5px dashed rgba(255,255,255,.2);border-radius:14px;grid-column:1/-1}
+.shelfempty .note{color:var(--mist);margin-top:4px}
 .shelf .item{min-width:0}
 .shelf .book3d{margin:0 auto}
 .shelf small{text-align:center}
@@ -672,13 +692,26 @@ async function drawShelf() {
     }
     box.innerHTML = books.length ? books.map((b) => {
       const url = b.pages[0]?.url;
-      const s = { key: b.story, title: b.title, cover: null };
-      return `<div class="item"><a class="book3d tiny" href="#/book/${b.id}" aria-label="Open ${esc(b.title)}, starring ${esc(b.child.name)}"><span class="rear"></span><span class="spine" style="--bk:${COLORS[b.story]}"></span><span class="pages"></span><span class="front">${url ? `<img src="${url}?thumb=1" alt="">` : `<span class="painting">${b.status === "failed" ? "This one couldn't be made" : "Being painted"}</span>`}<span class="title">${esc(s.title)}</span></span></a>
-        <small>Starring ${esc(b.child.name)}<br>${when(b.createdAt)}${b.status === "done" ? `<br><a href="/api/books/${b.id}/pdf">Download PDF</a>` : ""}${b.status !== "running" ? `<br><button class="linkish" data-del="${b.id}">Delete</button>` : ""}</small></div>`;
-    }).join("") : `<p class="note">Your books will live here, ready to read again whenever you like. Choose a story above to make your first one.</p>`;
+      const state = b.status === "done" ? "" : b.status === "failed" ? `<span class="tag bad">Couldn't be made · not charged</span>` : `<span class="tag">Being made…</span>`;
+      return `<article class="bk" style="--bk:${COLORS[b.story]}">
+        <a class="bkcover" href="#/book/${b.id}" aria-label="Open ${esc(b.title)}, starring ${esc(b.child.name)}">
+          ${url ? `<img src="${url}?thumb=1" alt="" loading="lazy">` : `<span class="bkblank">${b.status === "failed" ? "✕" : `<span class="brush"><span></span><span></span><span></span></span>`}</span>`}
+          <span class="bkspine"></span>${state}
+        </a>
+        <div class="bkinfo">
+          <h3><a href="#/book/${b.id}">${esc(b.child.name)}</a></h3>
+          <p>${esc(b.title)}</p>
+          <p class="bkdate">${when(b.createdAt)}</p>
+        </div>
+        <div class="bkact">
+          ${b.status === "done" ? `<a class="btn small" href="#/book/${b.id}">Read</a><a class="iconbtn" href="/api/books/${b.id}/pdf" title="Download the PDF" aria-label="Download the PDF"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 4v11m0 0l-4.5-4.5M12 15l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="iconbtn" href="#/print/${b.id}" title="Order a printed copy" aria-label="Order a printed copy"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M7 9V4h10v5M7 17H5a1 1 0 0 1-1-1v-5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v5a1 1 0 0 1-1 1h-2M8 14h8v6H8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></a>` : ""}
+          ${b.status !== "running" ? `<button class="iconbtn del" data-del="${b.id}" title="Delete this book" aria-label="Delete this book"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>` : ""}
+        </div>
+      </article>`;
+    }).join("") : `<div class="shelfempty"><p>Your books will live here, ready to read again whenever you like.</p><p class="note">Choose a story above to make your first one.</p></div>`;
     // Two clicks: the first asks, the second deletes.
     box.querySelectorAll("[data-del]").forEach((btn) => (btn.onclick = async () => {
-      if (!btn.dataset.sure) { btn.dataset.sure = "1"; btn.textContent = "Delete this book for good?"; return; }
+      if (!btn.dataset.sure) { btn.dataset.sure = "1"; btn.classList.add("sure"); btn.textContent = "Delete for good?"; setTimeout(() => { if (btn.isConnected && !btn.disabled) { delete btn.dataset.sure; btn.classList.remove("sure"); btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'; } }, 4000); return; }
       btn.disabled = true;
       try { await api(`/api/books/${btn.dataset.del}`, { method: "DELETE" }); drawShelf(); }
       catch (e) { btn.textContent = e.message; }
