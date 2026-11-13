@@ -1,0 +1,1079 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Storybook: a picture book with you in it</title>
+<meta name="description" content="Upload a photo and get a 20-page picture book starring you, in under a minute.">
+<link rel="preload" href="/fonts/andika/andika-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fraunces/fraunces-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:Andika;src:url(/fonts/andika/andika-latin-400-normal.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:Andika;src:url(/fonts/andika/andika-latin-700-normal.woff2) format("woff2");font-weight:700;font-display:swap}
+@font-face{font-family:Fraunces;src:url(/fonts/fraunces/fraunces-latin-700-normal.woff2) format("woff2");font-weight:700;font-display:swap}
+@font-face{font-family:Andika;src:url(/fonts/noto-sans-hebrew/noto-sans-hebrew-hebrew-400-normal.woff2) format("woff2");font-weight:400;font-display:swap;unicode-range:U+0590-05FF}
+@font-face{font-family:Andika;src:url(/fonts/noto-sans-hebrew/noto-sans-hebrew-hebrew-700-normal.woff2) format("woff2");font-weight:700;font-display:swap;unicode-range:U+0590-05FF}
+@font-face{font-family:Fraunces;src:url(/fonts/noto-sans-hebrew/noto-sans-hebrew-hebrew-700-normal.woff2) format("woff2");font-weight:700;font-display:swap;unicode-range:U+0590-05FF}
+:root{--dusk:#171f3f;--dusk2:#2b3468;--mist:#c6d0ea;--ink:#1b2a41;--soft:#56627a;--paper:#fffbf1;--edge:#e7dcc3;--gold:#e8b23a;--jack:#2f8a57;--red:#d0303b;--story:var(--gold)}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;color:var(--paper);font:400 17px/1.55 Andika,system-ui,sans-serif;background:var(--dusk);overflow-x:hidden}
+#sky{position:fixed;inset:0;z-index:-2;overflow:hidden;background:linear-gradient(#141b38,var(--dusk2))}
+#sky img{position:absolute;inset:-5%;width:110%;height:110%;max-width:none;object-fit:cover;object-position:50% 8%;opacity:0;transition:opacity 1.1s ease,transform 9s ease-out;transform:scale(1.06)}
+#sky img.on{opacity:1;transform:scale(1)}
+#sky:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(14,19,52,.86),rgba(14,19,52,.32) 58%,rgba(14,19,52,.45)),linear-gradient(rgba(14,19,52,.35),rgba(14,19,52,.1) 40%,rgba(14,19,52,.86))}
+body.deep #sky:after{background:rgba(14,19,52,.74)}
+#motes{position:fixed;inset:0;z-index:-1;pointer-events:none}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:700;line-height:1.08;margin:0}
+h1{font-size:clamp(38px,6.2vw,70px);letter-spacing:-.015em;max-width:14ch}
+h2{font-size:clamp(25px,3.2vw,34px)}
+h3{font-size:20px}
+p{margin:0}a{color:inherit}img{display:block;max-width:100%}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+header{display:flex;align-items:center;gap:16px;padding:18px 0}
+.logo{display:inline-flex;align-items:center;gap:10px;font:700 25px Fraunces,Georgia,serif;text-decoration:none;margin-right:auto;text-shadow:0 1px 10px rgba(5,8,28,.7)}
+.logo svg{width:26px;height:26px}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+/* On a phone the header stays one line: logo left, purse and Sign out right. */
+@media (max-width:480px){header{gap:10px;padding:14px 0}.logo{font-size:20px;gap:7px}.logo svg{width:22px;height:22px}#who{flex-wrap:nowrap;gap:10px}#who .purse{padding:3px 11px 3px 6px;font-size:15px}#who .linkish{font-size:15px;white-space:nowrap}}
+.linkish{background:none;border:0;padding:4px 2px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.purse{display:inline-flex;align-items:center;gap:8px;font-weight:700;text-decoration:none;background:rgba(13,18,50,.6);backdrop-filter:blur(8px);border-radius:999px;padding:4px 14px 4px 8px;white-space:nowrap;position:relative}
+.purse svg{width:24px;height:24px}
+.coin{position:absolute;left:14px;top:-70px;width:14px;height:14px;border-radius:50%;background:var(--gold);box-shadow:inset -2px -2px 0 #b98718;animation:coin .75s cubic-bezier(.5,0,.9,.6) both}
+@keyframes coin{to{transform:translateY(74px)}}
+.btn{display:inline-block;background:linear-gradient(#f6cc63,#e4a92f);color:#241a02;border:0;border-radius:999px;padding:13px 26px;font-weight:700;cursor:pointer;text-decoration:none;text-align:center;box-shadow:0 6px 18px rgba(232,178,58,.35),inset 0 1px 0 rgba(255,255,255,.55);transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 10px 26px rgba(232,178,58,.5),inset 0 1px 0 rgba(255,255,255,.55)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.btn.ghost{background:transparent;color:inherit;box-shadow:inset 0 0 0 1.5px currentColor}
+.btn.ghost:hover{background:rgba(127,127,127,.15);box-shadow:inset 0 0 0 1.5px currentColor}
+.btn.small{padding:7px 14px;font-size:15px}
+.btn.big{font-size:19px;padding:15px 30px}
+.note{color:var(--mist);font-size:15px}
+.onpaper .note,.paper .note,.open .note{color:var(--soft)}
+.err{background:#fbe6e6;color:#7c1a21;border-radius:8px;padding:10px 14px;margin:12px 0}
+.ok{background:#e4f2e8;color:#1b5234;border-radius:8px;padding:10px 14px;margin:12px 0}
+footer{padding:40px 0 44px;display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
+footer a{display:inline-block;padding:10px 20px;border-radius:999px;background:rgba(13,18,50,.68);backdrop-filter:blur(10px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);text-decoration:none;font-weight:700;font-size:15px;transition:background .15s,transform .15s}
+footer a:hover{background:rgba(43,52,104,.9);transform:translateY(-1px)}
+.hero{padding:16px 0 4px;display:grid;gap:14px}
+.hero p{max-width:48ch;font-size:19px;color:var(--mist)}
+
+/* The stories, in their world */
+.stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(20px,4vw,60px);align-items:center;min-height:min(74vh,700px)}
+.pitch{display:grid;gap:18px;justify-items:start}
+.pitch h1,.pitch h2{font-size:clamp(40px,5.6vw,74px);line-height:1.02;letter-spacing:-.018em;text-shadow:0 2px 26px rgba(10,14,40,.65);max-width:11ch}
+.pitch p{max-width:36ch;font-size:clamp(17px,1.6vw,20px);color:#e8ecf8;text-shadow:0 1px 12px rgba(10,14,40,.8)}
+.duo{display:grid;grid-template-columns:repeat(2,minmax(0,auto));justify-content:center;gap:clamp(22px,5vw,64px);perspective:1500px}
+.bookwrap{position:relative}
+body:not(.risen) .bookwrap{animation:rise .9s cubic-bezier(.2,.8,.2,1) both}
+body:not(.risen) .bookwrap:nth-child(2){animation-delay:.14s}
+.bookwrap:after{content:"";position:absolute;left:4%;right:4%;bottom:-26px;height:34px;background:radial-gradient(closest-side,rgba(5,8,28,.75),transparent);z-index:-1}
+@keyframes rise{from{transform:translateY(46px);opacity:0}to{transform:none;opacity:1}}
+.book3d{--w:clamp(132px,21vw,282px);--d:15px;--rx:3deg;--ry:21deg;width:var(--w);aspect-ratio:2/3;position:relative;transform-style:preserve-3d;transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .5s cubic-bezier(.2,.8,.2,1);display:block;text-decoration:none;background:none;border:0;padding:0;cursor:pointer;color:#fff}
+.book3d.live{transition:transform .08s linear}
+.book3d .front,.book3d .rear{position:absolute;inset:0;border-radius:2px 7px 7px 2px;overflow:hidden;background:var(--dusk2)}
+.book3d .front{transform:translateZ(var(--d));box-shadow:0 0 0 1px rgba(255,255,255,.08),inset 9px 0 8px -5px rgba(0,0,0,.5),inset 11px 0 1px -9px rgba(255,255,255,.25)}
+.book3d .rear{transform:translateZ(calc(var(--d) * -1)) rotateY(180deg);box-shadow:-34px 38px 50px rgba(3,6,24,.6)}
+.book3d .front img{width:100%;height:100%;object-fit:cover}
+.book3d .front:before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(rgba(8,12,38,.62),transparent 34%)}
+.book3d .front:after{content:"";position:absolute;inset:0;z-index:3;mix-blend-mode:soft-light;background:radial-gradient(70% 55% at var(--gx,30%) var(--gy,15%),rgba(255,255,255,.75),transparent 70%)}
+.book3d .spine{position:absolute;top:0;bottom:0;left:calc(var(--d) * -1);width:calc(var(--d) * 2);background:linear-gradient(90deg,rgba(0,0,0,.4),transparent 45%,rgba(0,0,0,.35)),linear-gradient(var(--gold),var(--gold)) 0 9% / 100% 3px no-repeat,linear-gradient(var(--gold),var(--gold)) 0 91% / 100% 3px no-repeat,var(--bk,#333);transform:rotateY(-90deg);border-radius:2px}
+.book3d .pages{position:absolute;top:1%;bottom:1%;left:calc(100% - var(--d));width:calc(var(--d) * 2 - 2px);background:repeating-linear-gradient(90deg,#fff8e6 0 1px,#d6c9ab 1px 2px);transform:rotateY(90deg)}
+.book3d .title{position:absolute;z-index:2;left:8%;right:8%;top:6%;font:700 clamp(17px,2.55vw,33px)/1.04 Fraunces,Georgia,serif;background:linear-gradient(170deg,#fff6d4,#f2c75c 55%,#fff0bb);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 3px rgba(5,8,28,.8))}
+.book3d .painting{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:14px;color:var(--mist);font-size:15px}
+.storyname{display:block;text-align:center;margin-top:30px;font-weight:700;text-shadow:0 1px 10px rgba(5,8,28,.9)}
+.tiny{--w:clamp(104px,16vw,146px);--d:7px;--ry:14deg;--rx:0deg}
+.tiny .title{font-size:clamp(12px,1.35vw,15px)}
+.tiny:hover{--ry:0deg;transform:rotateX(0) rotateY(0) translateY(-6px)}
+.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:30px 26px;margin-top:20px;perspective:1100px}
+.shelf .item{min-width:0}
+.shelf .book3d{margin:0 auto}
+.shelf small{text-align:center}
+.shelf small{display:block;margin-top:12px;color:#e0e5f4;font-size:14px;line-height:1.35}
+/* No backdrop blur here: Chrome slices the tilted 3D books inside a blurred panel. */
+.band{margin-top:30px;padding:26px clamp(16px,3vw,30px) 30px;background:rgba(13,18,50,.84);border-radius:14px}
+section{padding:30px 0}
+
+/* An open book */
+.open{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .36 0 0 0 0 .2 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E"),var(--paper);color:var(--ink);border-radius:6px;box-shadow:0 34px 70px rgba(3,6,24,.65);position:relative;perspective:1600px;margin-top:6px}
+.open:after{content:"";position:absolute;top:0;bottom:0;left:50%;width:44px;margin-left:-22px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(60,40,10,.2) 49%,rgba(60,40,10,.26) 50%,transparent)}
+.leftp{padding:clamp(24px,4vw,44px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
+.rightp{padding:clamp(24px,4vw,44px);display:flex;flex-direction:column;justify-content:center}
+.titleline{font:700 clamp(25px,3.5vw,38px)/1.1 Fraunces,Georgia,serif}
+.titleline em{font-style:normal;color:var(--story)}
+.oval{width:clamp(150px,20vw,220px);aspect-ratio:4/5;border-radius:50%;display:grid;place-items:center;text-align:center;cursor:pointer;background:#f3ebd8;box-shadow:0 0 0 5px var(--paper),0 0 0 8px var(--gold),0 0 0 13px var(--paper),0 0 0 14px #c8a968,0 14px 26px 12px rgba(90,60,10,.18);overflow:hidden;position:relative;margin:14px;padding:18px;font-weight:700;font-family:Fraunces,Georgia,serif;font-size:20px;line-height:1.15;transition:transform .15s}
+.oval:hover,.oval.over{transform:scale(1.03)}
+.oval img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.oval input{position:absolute;opacity:0;width:1px;height:1px}
+.oval:has(input:focus-visible){outline:3px solid var(--ink);outline-offset:18px}
+label{display:block;font-weight:700;margin:16px 0 5px}
+label small{font-weight:400;color:var(--soft)}
+input[type=text],input[type=number],textarea{width:100%;padding:9px 2px;border:0;border-bottom:2px solid #d8caa9;border-radius:0;background:transparent;color:var(--ink)}
+#name{font:700 24px Fraunces,Georgia,serif}
+.paper input[type=number],.paper input[type=text]{background:rgba(255,255,255,.5);padding:9px 10px;border-radius:6px 6px 0 0}
+input:focus,textarea:focus{border-color:var(--story);outline:0}
+textarea{min-height:70px;resize:vertical}
+.seg{display:inline-grid;grid-template-columns:1fr 1fr;align-self:flex-start;border:1.5px solid var(--ink);border-radius:8px;overflow:hidden}
+.seg label{margin:0;font-weight:400;padding:7px 24px;cursor:pointer;text-align:center}
+.seg input{position:absolute;opacity:0}
+.seg label:has(input:checked){background:var(--ink);color:var(--paper)}
+.seg label:has(input:focus-visible){outline:3px solid var(--story);outline-offset:-5px}
+details{margin-top:16px}summary{cursor:pointer;font-weight:700}
+.go{margin-top:20px;padding-top:16px;border-top:1.5px solid var(--edge)}
+.swing{position:absolute;top:0;bottom:0;right:0;width:50%;transform-origin:left center;transform-style:preserve-3d;animation:swing 1s cubic-bezier(.45,.05,.3,1) .1s both;pointer-events:none;z-index:4}
+.swing img,.swing div{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;backface-visibility:hidden;border-radius:0 6px 6px 0}
+.swing div{transform:rotateY(180deg);background:var(--story)}
+@keyframes swing{to{transform:rotateY(-178deg);visibility:hidden}}
+
+/* Being painted */
+.making{display:grid;grid-template-columns:clamp(70px,10vw,120px) minmax(0,1fr);gap:clamp(14px,3vw,34px);align-items:stretch;margin-top:6px}
+.vine{width:100%;height:100%;min-height:380px;overflow:visible}
+.status h2{min-height:2.2em;font-size:clamp(28px,3.6vw,44px);text-shadow:0 2px 18px rgba(5,8,28,.7)}
+.bar{height:12px;border-radius:6px;background:rgba(255,255,255,.14);overflow:hidden;margin:12px 0 6px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#e4a92f,#ffe08a);box-shadow:0 0 14px #f2c75c;transition:width .5s ease-out}
+.easel{display:grid;grid-template-columns:minmax(150px,270px) minmax(0,1fr);gap:clamp(14px,3vw,30px);margin-top:18px;align-items:start;perspective:1200px}
+.fresh{aspect-ratio:2/3;background:var(--paper);border-radius:3px;box-shadow:0 16px 30px rgba(0,0,0,.45);position:relative;overflow:hidden;display:grid;place-items:center;color:var(--soft);text-align:center;padding:12px}
+.fresh img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:wet .55s ease-out both}
+@keyframes wet{from{opacity:0;transform:scale(1.03)}to{opacity:1;transform:none}}
+.slots{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px}
+.slot{aspect-ratio:2/3;border-radius:2px;background:rgba(255,255,255,.1);display:grid;place-items:center;color:var(--mist);font-size:13px;overflow:hidden;position:relative}
+.slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:land .45s cubic-bezier(.2,.8,.3,1.2) both}
+@keyframes land{from{transform:translateX(-46px) rotateY(50deg);opacity:0}to{transform:none;opacity:1}}
+
+/* Reading */
+.reader{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(20px,4vw,44px);align-items:start;margin-top:14px}
+.stack{position:relative;aspect-ratio:2/3;width:100%;max-width:min(560px,calc((100vh - 200px)*2/3));margin:0 auto;perspective:1900px;touch-action:pan-y;cursor:grab;user-select:none}
+.leaf{position:absolute;inset:0;background:var(--paper);color:var(--ink);overflow:hidden;border-radius:2px 5px 5px 2px;box-shadow:0 18px 34px rgba(0,0,0,.5),inset 10px 0 14px -10px rgba(60,40,10,.5);transform-origin:left center;backface-visibility:hidden;container-type:inline-size}
+.leaf.top{z-index:2}
+.leaf.anim{transition:transform .62s cubic-bezier(.4,.05,.35,1)}
+.leaf>img{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.words{position:absolute;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;background:rgba(255,251,241,.93);border-radius:2.8cqw;color:var(--ink);white-space:nowrap}
+.words.title{font-family:Fraunces,Georgia,serif;font-weight:700}
+.words small{font-family:Andika,sans-serif;font-weight:400;color:var(--soft)}
+.about{position:absolute;inset:0;padding:6cqw;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:1.5cqw;font-size:3.4cqw}
+.about h3{font-size:8cqw;color:var(--story)}
+.about img{width:50cqw;aspect-ratio:1;object-fit:cover;margin:2cqw 0}
+.about b{font:700 6cqw Fraunces,Georgia,serif}
+.about dl{margin:2cqw 0 0}.about dt{font-weight:700;color:var(--story);font-size:2.7cqw;margin-top:1.6cqw}.about dd{margin:0}
+.back{position:absolute;inset:0;background:var(--story);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4cqw;text-align:center;padding:8cqw}
+.back h3{font-size:11cqw}
+.nav{display:flex;justify-content:center;align-items:center;gap:14px;margin:16px auto 0}
+.tries{position:absolute;right:3px;bottom:3px;z-index:2;background:rgba(14,19,44,.88);color:#fff;font:700 11px/1 Andika,sans-serif;padding:3px 5px;border-radius:9px;letter-spacing:.02em;pointer-events:none}
+.tries.best{background:#a4560f}
+.tries.live{left:3px;right:3px;text-align:center;background:var(--gold);color:var(--ink);animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.6}}
+.strip button{position:relative}
+.strip .tries{font-size:9px;padding:2px 3px;right:1px;bottom:1px}
+.readbar .tryline{grid-column:1/-1;text-align:center}
+.tryline{min-height:1.5em;margin-top:8px;color:var(--mist)}
+.tryline b{color:var(--paper)}
+.legend{margin-top:10px;color:var(--mist);font-size:14px}
+.cost{margin-top:22px}
+.cost .vs{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.cost .vs b{font:700 40px/1 Fraunces,Georgia,serif}
+.cost .bar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--edge);margin:12px 0 6px}
+.cost .bar i{display:block;height:100%}
+.cost .key{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:14px;color:var(--soft)}
+.cost .key span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;background:var(--c)}
+.strip{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-top:16px}
+.strip button{padding:0;border:0;background:none;cursor:pointer;border-radius:2px;overflow:hidden;aspect-ratio:2/3;opacity:.7;color:var(--mist)}
+.strip button[aria-current=true],.strip button:hover{opacity:1;outline:2px solid var(--gold)}
+.strip img{width:100%;height:100%;object-fit:cover}
+.scores{font-size:14.5px;margin-top:6px;color:var(--mist)}
+
+/* A real open book on wide screens */
+.spread{position:relative;width:100%;max-width:min(1060px,calc((100vh - 210px)*4/3));aspect-ratio:4/3;margin:18px auto 0;perspective:2400px;touch-action:pan-y;cursor:grab;user-select:none;transition:transform .62s cubic-bezier(.4,.05,.35,1)}
+.spread[data-state=start]{transform:translateX(-25%)}
+.spread[data-state=end]{transform:translateX(25%)}
+.side{position:absolute;top:0;bottom:0;width:50%;background:var(--paper);color:var(--ink);overflow:hidden;container-type:inline-size;box-shadow:0 22px 44px rgba(3,6,24,.55)}
+.side>img{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.side.l{left:0;border-radius:5px 0 0 5px}
+.side.r{left:50%;border-radius:0 5px 5px 0}
+.side:after{content:"";position:absolute;inset:0;pointer-events:none;z-index:3}
+.side.l:after{background:linear-gradient(270deg,rgba(40,25,5,.32),transparent 9%)}
+.side.r:after{background:linear-gradient(90deg,rgba(40,25,5,.32),transparent 9%)}
+.flip{position:absolute;left:50%;top:0;bottom:0;width:50%;transform-origin:left center;transform-style:preserve-3d;z-index:4}
+.flip.anim{transition:transform .72s cubic-bezier(.4,.05,.35,1)}
+.flip .side{left:0;width:100%;backface-visibility:hidden}
+.flip .side.l{transform:rotateY(180deg)}
+.readbar{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:14px;margin-top:18px}
+.readbar .nav{margin:0}
+.strip.wide{grid-template-columns:repeat(21,minmax(0,1fr));gap:4px;margin-top:18px}
+
+/* Money */
+.bignum{font:700 clamp(46px,8vw,76px)/1 Fraunces,Georgia,serif}
+.money{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(20px,4vw,40px);align-items:stretch;margin-top:14px}
+.paper{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .36 0 0 0 0 .2 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E"),var(--paper);color:var(--ink);border-radius:6px;padding:clamp(18px,3vw,28px);box-shadow:0 16px 30px rgba(0,0,0,.35)}
+.tablewrap{overflow-x:auto;margin-top:10px}
+.table{width:100%;border-collapse:collapse;font-size:16px}
+.table td:nth-child(2){overflow-wrap:anywhere}
+.table .day,.table .time{white-space:nowrap}
+.paper .note{overflow-wrap:anywhere}
+.table th{text-align:left;font-weight:700;padding:6px 10px 6px 0;border-bottom:1.5px solid var(--ink)}
+.table td{padding:9px 10px 9px 0;border-bottom:1px solid var(--edge);vertical-align:top}
+.num{text-align:right!important;white-space:nowrap;font-variant-numeric:tabular-nums}
+.plus{color:#1f7a46;font-weight:700}
+.refund{display:grid;gap:8px;margin-top:8px;padding:10px;background:#fff;border-radius:8px}
+.refund[hidden]{display:none}
+/* A printed copy */
+.print{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:clamp(20px,4vw,40px);align-items:start;margin-top:14px}
+.step{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.step i{font:700 15px/1 Fraunces,Georgia,serif;font-style:normal;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--paper);flex:none}
+.step.done i{background:#1f7a46}
+.pdfview{width:100%;aspect-ratio:2/3;max-height:640px;border:1px solid var(--edge);border-radius:6px;background:#eee;margin:8px 0}
+.prints{margin:10px 0 0;padding-left:20px}.prints li{margin:3px 0}
+.check{display:flex;gap:10px;align-items:flex-start;font-weight:400;margin:14px 0}
+.check input{margin-top:5px;width:18px;height:18px;flex:none}
+.grid2{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1.2fr);gap:0 12px}
+.paper select{width:100%;padding:9px 6px;border:0;border-bottom:2px solid #d8caa9;background:rgba(255,255,255,.5);font:inherit;color:var(--ink)}
+.locked{opacity:.45;pointer-events:none}
+.bad{border-color:#c0303b!important;background:#fdf0f0!important}
+.math td:first-child{color:var(--soft)}.math td{padding:5px 0;border-bottom:1px solid var(--edge)}.math tr.sum td{font-weight:700;color:var(--ink);border-bottom:1.5px solid var(--ink)}
+.orderline{padding:12px 0;border-bottom:1px solid var(--edge)}
+.pill{display:inline-block;font-size:13px;font-weight:700;border-radius:999px;padding:2px 10px;background:#e9eefb;color:#25407a}
+.pill.good{background:#e4f2e8;color:#1b5234}.pill.bad{background:#fbe6e6;color:#7c1a21}
+.sandbox{font-size:14px;background:#fff6dc;color:#6b4e0d;border-radius:8px;padding:8px 12px;margin-top:10px}
+.inside{position:absolute;inset:0;background:var(--paper);color:var(--ink);display:flex;flex-direction:column;justify-content:flex-end;align-items:center;text-align:center;padding:9cqw 12cqw 13cqw;gap:2.2cqw;font-size:2.5cqw;line-height:1.45}
+.inside h4{font:700 3.6cqw/1.25 Fraunces,Georgia,serif;color:var(--story);margin:0 0 1cqw}
+@media (max-width:760px){
+ .print{grid-template-columns:minmax(0,1fr)}
+ .grid2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+ .stage{grid-template-columns:minmax(0,1fr);min-height:0;gap:26px}
+ .open{grid-template-columns:minmax(0,1fr)}
+ .open:after,.swing{display:none}
+ .leftp{padding-bottom:0}
+ .reader,.money{grid-template-columns:minmax(0,1fr)}
+ .easel{grid-template-columns:minmax(0,1fr)}
+ .fresh{max-width:220px;margin:0 auto;width:100%}
+ .slots{gap:4px}
+ .slot{font-size:10px}
+ .vine{min-height:300px}
+ .table{font-size:15px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.swing{display:none}.coin{display:none}.book3d{transform:none}.bookwrap{animation:none}}
+</style>
+</head>
+<body>
+<div id="sky" aria-hidden="true"><img id="sky1" alt=""><img id="sky2" alt=""></div><canvas id="motes" aria-hidden="true"></canvas>
+<div class="wrap">
+  <header id="top"><a class="logo" href="#/"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#e8b23a" d="M12 6C9.5 4.2 6 3.8 2.5 4.5v14c3.500-.700 7-.300 9.500 1.500 2.500-1.800 6-2.200 9.500-1.500v-14C18 3.800 14.500 4.200 12 6z"/><path stroke="#6b4e0d" stroke-width="1.300" d="M12 6v14"/></svg>Storybook</a><span id="who"></span></header>
+  <main id="app"></main>
+  <footer><a href="/bible">Meet the characters</a><a href="/privacy">Privacy</a></footer>
+</div>
+<script>
+const $ = (s, el = document) => el.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const money = (c) => `$${(Math.abs(c) / 100).toFixed(2)}`;
+const usd = (d, places = 2) => `$${Number(d || 0).toFixed(places)}`;
+
+// The quality loop, page by page: how many tries a picture took (up to 3), and
+// which one was kept. Shown on every thumbnail and under the page being read.
+const MAX_TRIES = 3;
+const triesOf = (p) => (p.attempts || []).filter((a) => !a.skipped && !a.error).length || (p.attempts || []).filter((a) => !a.skipped).length;
+function triesBadge(p) {
+  const n = p.tries ?? triesOf(p);
+  if (!n) return "";
+  const best = p.passed === false;
+  return `<span class="tries ${best ? "best" : ""}" title="${esc(tryText(p))}">${n}/${MAX_TRIES}${best ? " ★" : ""}</span>`;
+}
+function tryText(p) {
+  const n = p.tries ?? triesOf(p);
+  const pre = p.ahead ? "Painted ahead of time (you aren't on this page). " : "";
+  if (!n) return p.ahead ? "Painted ahead of time." : "";
+  const kept = p.kept ?? n, sc = p.score != null ? `, check score ${p.score}` : "";
+  if (p.passed !== false) return n === 1 ? `${pre}Passed the check on try 1 of ${MAX_TRIES}${sc}.` : `${pre}Try ${kept} of ${MAX_TRIES} passed the check${sc}.`;
+  const why = n < MAX_TRIES ? `${n} of ${MAX_TRIES} tries before time ran out` : `All ${MAX_TRIES} tries had problems`;
+  return `${pre}${why}: kept the best, try ${kept}${sc}.`;
+}
+const when = (d) => new Date(d).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+// In a narrow table: the day on one line, the time under it.
+const whenLines = (d) => { const t = new Date(d); return `<span class="day">${t.toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span><br><span class="note time">${t.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}</span>`; };
+const app = $("#app");
+const COLORS = { jack: "var(--jack)", red: "var(--red)" };
+const CALM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let catalog = null, me = undefined, stream = null;
+const PURSE = `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#e8b23a" d="M4 10c0-2 2-3 8-3s8 1 8 3v8c0 2-3 3-8 3s-8-1-8-3z"/><path fill="none" stroke="#a97b12" stroke-width="1.6" d="M7 7c1-3 3-4 5-4s4 1 5 4"/><circle cx="12" cy="12" r="1.7" fill="#a97b12"/></svg>`;
+
+async function api(path, opts = {}) {
+  const res = await fetch(path, { credentials: "same-origin", ...opts, headers: opts.body && !(opts.body instanceof FormData) ? { "Content-Type": "application/json" } : {} });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw Object.assign(new Error(data.error || "Something went wrong. Try again."), { status: res.status, field: data.field });
+  return data;
+}
+const post = (path, body) => api(path, { method: "POST", body: JSON.stringify(body) });
+
+function drawTop() {
+  $("#who").className = "row";
+  $("#who").innerHTML = me?.user
+    ? `<a class="purse" id="purse" href="#/money" title="Your balance and history">${PURSE}${money(me.balance)}</a><button class="linkish" id="out">Sign out</button>`
+    : me === null ? `<a class="btn small" href="/auth/google">Sign in with Google</a>` : "";
+  $("#out")?.addEventListener("click", async () => { await post("/auth/logout", {}); me = null; location.hash = "#/"; drawTop(); route(); });
+}
+async function refreshMe() {
+  try { const r = await api("/api/me"); me = r.user ? r : null; } catch { me = null; }
+  drawTop();
+}
+function dropCoins() {
+  const p = $("#purse"); if (!p || CALM) return;
+  for (let i = 0; i < 5; i++) setTimeout(() => { const c = document.createElement("i"); c.className = "coin"; p.append(c); c.onanimationend = () => c.remove(); }, i * 130);
+}
+// Morph between views where the browser can.
+function swap(fn) { document.startViewTransition && !CALM ? document.startViewTransition(fn) : fn(); }
+
+// The world behind everything: the painted story, fading from one to the other.
+let skyOn = 0, skyId = null;
+function setSky(id, deep) {
+  document.body.classList.toggle("deep", !!deep);
+  // Behind a page, the small picture stretched large is already soft, and cheap to draw.
+  const key = `${id}:${!!deep}`;
+  if (!id || key === skyId) return;
+  skyId = key;
+  const im = new Image(), src = deep ? `/art/${id}?thumb=1` : `/art/${id}`;
+  im.onload = () => {
+    if (skyId !== key) return;
+    const next = $(skyOn ? "#sky1" : "#sky2"), last = $(skyOn ? "#sky2" : "#sky1");
+    next.src = src; next.classList.add("on"); last.classList.remove("on"); skyOn = 1 - skyOn;
+  };
+  im.src = src;
+}
+const storyOf = (k) => catalog?.stories.find((s) => s.key === k);
+
+// Golden dust drifting up through the page. Light, and off for reduced motion.
+(function motes() {
+  if (CALM) return;
+  const cv = $("#motes"), cx = cv.getContext("2d");
+  let W, H, list;
+  const size = () => { W = cv.width = innerWidth; H = cv.height = innerHeight; };
+  size(); addEventListener("resize", size);
+  list = Array.from({ length: Math.min(46, Math.round(innerWidth / 26)) }, () => ({ x: Math.random(), y: Math.random(), r: 0.7 + Math.random() * 1.9, v: 0.00016 + Math.random() * 0.0004, p: Math.random() * 6.28 }));
+  const draw = (t) => {
+    cx.clearRect(0, 0, W, H);
+    for (const m of list) {
+      m.y -= m.v; if (m.y < -0.03) { m.y = 1.03; m.x = Math.random(); }
+      const a = 0.28 + 0.42 * Math.abs(Math.sin(t / 1400 + m.p));
+      const x = (m.x + Math.sin(t / 3300 + m.p) * 0.012) * W, y = m.y * H;
+      cx.fillStyle = `rgba(255,224,138,${a})`;
+      cx.beginPath(); cx.arc(x, y, m.r, 0, 6.28); cx.fill();
+    }
+    requestAnimationFrame(draw);
+  };
+  requestAnimationFrame(draw);
+})();
+
+// A book leans toward the pointer, and the light slides across its cover.
+function tiltBooks() {
+  if (CALM || matchMedia("(hover: none)").matches) return;
+  app.querySelectorAll(".duo .book3d").forEach((b) => {
+    b.addEventListener("pointermove", (e) => {
+      const r = b.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+      b.classList.add("live");
+      b.style.setProperty("--ry", `${(x - 0.5) * 22}deg`);
+      b.style.setProperty("--rx", `${(0.5 - y) * 14}deg`);
+      b.style.setProperty("--gx", `${x * 100}%`);
+      b.style.setProperty("--gy", `${y * 100}%`);
+    });
+    b.addEventListener("pointerleave", () => { b.classList.remove("live"); ["--ry", "--rx", "--gx", "--gy"].forEach((v) => b.style.removeProperty(v)); });
+  });
+}
+
+function bookCard(s, href, cls = "") {
+  const inner = `<span class="rear"></span><span class="spine" style="--bk:${COLORS[s.key]}"></span><span class="pages"></span>
+    <span class="front">${s.cover ? `<img src="/art/${s.cover}?thumb=1" data-full="/art/${s.cover}" alt="" width="320" height="480" style="view-transition-name:cover-${s.key}">` : `<span class="painting">Being painted</span>`}<span class="title">${esc(s.title)}</span></span>`;
+  return `<a class="book3d ${cls}" data-story="${s.key}" href="${href}" aria-label="${esc(s.title)}">${inner}</a>`;
+}
+
+function viewHome() {
+  const stories = catalog?.stories || [];
+  const signedIn = !!me?.user;
+  setSky(stories[0]?.world);
+  app.innerHTML = `
+    <div class="stage">
+      <div class="pitch">
+        ${signedIn ? `<h1>Which story are you in next?</h1><p>Open a book and add a photo. In under a minute, you're on all 20 pages.</p>` : `<h1>A picture book with you in it.</h1>
+        <p>Open a book and add a photo. In under a minute, you're on all 20 pages. Each book costs $0.99, and a printed copy can come to your door.</p>
+        ${me === null ? `<div class="row"><a class="btn big" href="/auth/google">Sign in with Google to start</a>${catalog?.devLogin ? `<a class="btn ghost" href="/auth/dev">Dev sign-in</a>` : ""}</div>` : ""}`}
+      </div>
+      <div class="duo">${stories.map((s) => `<div class="bookwrap">${bookCard(s, signedIn ? `#/new/${s.key}` : "/auth/google")}</div>`).join("")}</div>
+    </div>
+    ${signedIn ? `<section class="band"><h2>Your books</h2><div id="books" class="shelf"><p class="note">Opening your shelf</p></div></section>` : ""}`;
+  if (stories.length && me !== undefined) setTimeout(() => document.body.classList.add("risen"), 1200);
+  tiltBooks();
+  app.querySelectorAll(".duo .book3d").forEach((b) => {
+    const go = () => setSky(storyOf(b.dataset.story)?.world);
+    b.addEventListener("pointerenter", go); b.addEventListener("focus", go);
+    const im = $("img", b);
+    if (im) { const full = new Image(); full.onload = () => { im.src = full.src; }; full.src = im.dataset.full; }
+  });
+  if (signedIn) drawShelf();
+}
+
+async function drawShelf() {
+  const box = $("#books");
+  try {
+    const { books } = await api("/api/books");
+    if (!$("#books")) return;
+    box.innerHTML = books.length ? books.map((b) => {
+      const url = b.pages[0]?.url;
+      const s = { key: b.story, title: b.title, cover: null };
+      return `<div class="item"><a class="book3d tiny" href="#/book/${b.id}" aria-label="Open ${esc(b.title)}, starring ${esc(b.child.name)}"><span class="rear"></span><span class="spine" style="--bk:${COLORS[b.story]}"></span><span class="pages"></span><span class="front">${url ? `<img src="${url}?thumb=1" alt="">` : `<span class="painting">${b.status === "failed" ? "This one couldn't be made" : "Being painted"}</span>`}<span class="title">${esc(s.title)}</span></span></a>
+        <small>Starring ${esc(b.child.name)}<br>${when(b.createdAt)}${b.status === "done" ? `<br><a href="/api/books/${b.id}/pdf">Download PDF</a>` : ""}${b.status !== "running" ? `<br><button class="linkish" data-del="${b.id}">Delete</button>` : ""}</small></div>`;
+    }).join("") : `<p class="note">Your finished books live here, ready to read or download again. Pick a story above to make your first.</p>`;
+    // Two clicks: the first asks, the second deletes.
+    box.querySelectorAll("[data-del]").forEach((btn) => (btn.onclick = async () => {
+      if (!btn.dataset.sure) { btn.dataset.sure = "1"; btn.textContent = "Delete this book for good?"; return; }
+      btn.disabled = true;
+      try { await api(`/api/books/${btn.dataset.del}`, { method: "DELETE" }); drawShelf(); }
+      catch (e) { btn.textContent = e.message; }
+    }));
+  } catch (e) { box.innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+}
+
+function viewNew(key) {
+  if (!me?.user) return viewHome();
+  const s = catalog?.stories.find((x) => x.key === key);
+  if (!s) { location.hash = "#/"; return; }
+  document.documentElement.style.setProperty("--story", COLORS[key]);
+  setSky(s.world, true);
+  const enough = me.balance >= me.bookCents;
+  app.innerHTML = `
+    <form class="open" id="f" enctype="multipart/form-data">
+      <div class="leftp">
+        <label class="oval" id="drop" for="photo" style="margin:14px">
+          <span id="ovaltext">Who's the star? <br><span style="font:400 15px Andika,sans-serif">Add a photo</span></span>
+          <img id="ph" alt="" hidden>
+          <input id="photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" required>
+        </label>
+        <p class="note" style="max-width:26ch">One person, facing the camera, with their face well lit.</p>
+        <p id="lastrow"></p>
+      </div>
+      <div class="rightp">
+        <div class="titleline">${esc(s.title)},<br>starring <em id="starname">you</em></div>
+        <label for="name">Their name</label>
+        <input id="name" name="name" type="text" maxlength="40" required autocomplete="off">
+        <input type="hidden" id="same" name="samePhoto" value="">
+        <label>Is the star a boy or a girl?</label>
+        <div class="seg" role="radiogroup" aria-label="Is the star a boy or a girl?">
+          ${[["he", "Boy"], ["she", "Girl"]].map(([v, l]) => `<label><input type="radio" name="pronoun" value="${v}" ${v === s.pronoun ? "checked" : ""}>${l}</label>`).join("")}
+        </div>
+        <details><summary>Add to the About Me page <span class="note" style="font-weight:400">(optional)</span></summary>
+          <label for="age">Age</label><input id="age" name="age" type="text" maxlength="20">
+          <label for="likes">Favourite thing to do</label><input id="likes" name="likes" type="text" maxlength="60">
+          <label for="food">Favourite food</label><input id="food" name="food" type="text" maxlength="60">
+          <label for="growUp">When I grow up</label><input id="growUp" name="growUp" type="text" maxlength="60">
+          <label for="more">Anything else</label><textarea id="more" name="more" maxlength="300"></textarea>
+        </details>
+        <div class="go">
+          <div id="ferr"></div>
+          ${s.ready ? (enough
+            ? `<button class="btn big" id="go">Make my book for $0.99</button><p class="note" style="margin-top:8px">Your balance is ${money(me.balance)}.</p>`
+            : `<p style="margin-bottom:10px">A book costs $0.99, and your balance is ${money(me.balance)}.</p><a class="btn big" href="#/money">Add money</a>`)
+            : `<p class="note">This story's pictures are still being painted. Come back in a few minutes.</p>`}
+        </div>
+      </div>
+      ${s.cover && !CALM ? `<div class="swing" aria-hidden="true"><img src="/art/${s.cover}?thumb=1" alt=""><div></div></div>` : ""}
+    </form>`;
+  const setPhoto = (src) => { const ph = $("#ph"); ph.src = src; ph.hidden = false; $("#ovaltext").hidden = true; };
+  $("#photo").addEventListener("change", (e) => {
+    const f = e.target.files[0];
+    if (f) { setPhoto(URL.createObjectURL(f)); $("#same").value = ""; $("#lastrow").textContent = ""; }
+  });
+  const drop = $("#drop");
+  ["dragenter", "dragover"].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add("over"); }));
+  ["dragleave", "drop"].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove("over"); }));
+  drop.addEventListener("drop", (e) => { const f = e.dataTransfer.files[0]; if (!f) return; const dt = new DataTransfer(); dt.items.add(f); $("#photo").files = dt.files; $("#photo").dispatchEvent(new Event("change")); });
+  $("#name").addEventListener("input", (e) => { $("#starname").textContent = e.target.value.trim() || "you"; });
+  api("/api/books").then(({ books }) => {
+    const last = books.find((b) => b.photo);
+    if (!last || !$("#f") || $("#photo").files[0]) return;
+    $("#lastrow").innerHTML = `<button type="button" class="linkish" id="uselast">Use my last photo</button>`;
+    $("#uselast").onclick = () => { setPhoto(`/img/${last.photo}?thumb=1`); $("#same").value = "1"; $("#photo").required = false; $("#lastrow").textContent = "Using your last photo."; };
+  }).catch(() => {});
+  $("#f").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const go = $("#go"); if (!go) return;
+    go.disabled = true; go.textContent = "Opening your book";
+    const fd = new FormData(e.target); fd.append("story", key);
+    try {
+      const { id } = await api("/api/books", { method: "POST", body: fd });
+      me.balance -= me.bookCents; drawTop();
+      location.hash = `#/book/${id}`;
+    } catch (err) {
+      $("#ferr").innerHTML = `<div class="err">${esc(err.message)}${err.status === 402 ? ` <a href="#/money" style="color:inherit;font-weight:700">Add money</a>` : ""}</div>`;
+      const bad = err.field && $(`#${err.field}`, e.target);
+      if (bad) { if (bad.closest("details")) bad.closest("details").open = true; bad.classList.add("bad"); bad.focus(); bad.addEventListener("input", () => bad.classList.remove("bad"), { once: true }); }
+      go.disabled = false; go.textContent = "Make my book for $0.99";
+    }
+  });
+}
+
+function viewBook(id) {
+  if (!me?.user) return viewHome();
+  app.innerHTML = `<p class="note">Opening your book</p>`;
+  api(`/api/books/${id}`).then(({ book }) => {
+    document.documentElement.style.setProperty("--story", COLORS[book.story]);
+    setSky(storyOf(book.story)?.world, true);
+    if (book.status === "running") return viewMaking(book);
+    if (book.status === "failed") return (app.innerHTML = `<div class="paper"><h2>This book couldn't be made</h2><div class="err">${esc(book.error)}</div><p>The $0.99 went back to your balance. <a href="#/new/${book.story}">Try again</a></p></div>`);
+    viewReader(asPrinted(book));
+  }).catch((e) => (app.innerHTML = `<div class="err">${esc(e.message)}</div>`));
+}
+
+// The progress climbs: a beanstalk for Jack, a forest path for Little Red.
+function climbSvg(story) {
+  const isJack = story === "jack";
+  const d = isJack ? "M60 600 C10 520 110 470 60 390 C10 310 110 260 60 180 C30 120 80 70 60 22" : "M60 600 C120 540 0 500 60 430 C120 360 0 320 60 250 C120 180 10 130 60 58";
+  const colour = isJack ? "#49b777" : "#d9c28e";
+  const goal = isJack
+    ? `<path d="M34 34V10l7 6 6-10 7 10 6-10 7 10 6-6v24z" fill="#c9d3ec"/><rect x="52" y="20" width="16" height="14" rx="8" fill="#2b3468"/>`
+    : `<path d="M34 58V36l26-20 26 20v22z" fill="#c9a06a"/><path d="M28 38L60 12l32 26z" fill="#8c5a3a"/><rect x="53" y="42" width="14" height="16" fill="#2b3468"/>`;
+  return `<svg class="vine" viewBox="0 0 120 620" preserveAspectRatio="xMidYMax meet" role="img" aria-label="${isJack ? "A beanstalk" : "A forest path"} growing as your book is painted">
+    ${goal}
+    <path d="${d}" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="${isJack ? 9 : 13}" stroke-linecap="round"/>
+    <path id="climb" d="${d}" pathLength="100" fill="none" stroke="${colour}" stroke-width="${isJack ? 9 : 13}" stroke-linecap="round" stroke-dasharray="100" stroke-dashoffset="98" style="transition:stroke-dashoffset .6s ease-out"/>
+    <g id="climber">${isJack ? `<ellipse rx="15" ry="8" fill="#49b777" transform="rotate(-24)"/>` : `<path d="M0-14 12 10H-12z" fill="#d0303b"/><circle cy="-13" r="6" fill="#f0c9a5"/>`}</g>
+  </svg>`;
+}
+
+function viewMaking(book) {
+  const words = (catalog?.stories.find((s) => s.key === book.story) || {});
+  app.innerHTML = `<div class="making">
+    <div>${climbSvg(book.story)}</div>
+    <div class="status">
+      <h2 id="stage" aria-live="polite">Reading your photo</h2>
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="barw"><i id="bar" style="width:2%"></i></div>
+      <div class="row note" style="justify-content:space-between"><span id="clock">0 seconds</span><span>${esc(book.title)}, starring ${esc(book.child.name)}</span></div>
+      <div class="easel">
+        <div class="fresh" id="fresh">The first page is on the easel.</div>
+        <div class="slots">${Array.from({ length: 20 }, (_, i) => `<div class="slot" id="s${i + 1}">${i + 1}</div>`).join("")}</div>
+        <p class="legend">Every picture is checked as it's painted. The number on each page is the try that's on it, out of ${MAX_TRIES}. A page that fails the check is painted again; if all ${MAX_TRIES} tries have problems, the best one is kept and marked ★.</p>
+      </div>
+    </div>
+  </div>`;
+  const path = $("#climb"), climber = $("#climber"), L = path.getTotalLength();
+  const climbTo = (pct) => {
+    path.style.strokeDashoffset = 100 - pct;
+    const pt = path.getPointAtLength((pct / 100) * L);
+    climber.setAttribute("transform", `translate(${pt.x} ${pt.y})`);
+  };
+  climbTo(2);
+  // Pages can land faster than the eye: show them one at a time, new over old.
+  const easel = [];
+  const show = setInterval(() => {
+    const box = $("#fresh"); if (!box) return clearInterval(show);
+    const t = easel.shift(); if (!t) return;
+    box.firstChild?.nodeType === 3 && (box.textContent = "");
+    const im = new Image(); im.src = t.url; im.alt = `Page ${t.n}, just painted`;
+    im.onload = () => { box.append(im); while (box.children.length > 2) box.firstChild.remove(); };
+  }, 650);
+  const started = new Date(book.createdAt).getTime();
+  const tick = setInterval(() => { const el = $("#clock"); if (!el) return clearInterval(tick); const s = Math.max(0, Math.round((Date.now() - started) / 1000)); el.textContent = `${s} second${s === 1 ? "" : "s"}`; }, 500);
+  stream?.close();
+  stream = new EventSource(`/api/books/${book.id}/events`);
+  const seen = new Set();
+  stream.onmessage = (ev) => {
+    const s = JSON.parse(ev.data);
+    const stage = $("#stage"); if (!stage) return stream.close();
+    if (s.label) stage.textContent = s.label;
+    $("#bar").style.width = `${s.percent}%`; $("#barw").setAttribute("aria-valuenow", Math.round(s.percent));
+    climbTo(s.percent);
+    for (const [n, a] of Object.entries(s.tries || {})) {
+      if (seen.has(+n)) continue;
+      const slot = $(`#s${n}`); if (!slot) continue;
+      slot.innerHTML = `${n}<span class="tries live">try ${a}/${MAX_TRIES}</span>`;
+    }
+    for (const t of s.thumbs || []) {
+      if (seen.has(t.n)) continue; seen.add(t.n);
+      $(`#s${t.n}`).innerHTML = `<img src="${t.url}" alt="Page ${t.n}">${triesBadge(t)}`;
+      easel.push(t);
+    }
+    if (s.stage === "done" || s.stage === "failed" || s.stage === "lost") { stream.close(); clearInterval(tick); setTimeout(() => viewBook(book.id), s.stage === "done" ? 900 : 0); }
+  };
+  stream.onerror = () => { stream.close(); clearInterval(tick); setTimeout(() => { if ($("#stage")) viewBook(book.id); }, 2000); };
+}
+
+function pageHtml(book, i) {
+  const n = book.pages.length;
+  if (i === n + 1) return `<div class="back"><h3>The End</h3><a class="btn" style="background:#fff;color:var(--ink)" href="#/print/${book.id}">Order a printed copy</a><a style="color:#fff" href="/api/books/${book.id}/pdf">Download the PDF</a><a style="color:#fff" href="#/">Back to your shelf</a></div>`;
+  if (i === n) {
+    const c = book.child;
+    const rows = [["age", "Age"], ["likes", "Favourite thing to do"], ["food", "Favourite food"], ["growUp", "When I grow up"]].filter(([k]) => c[k]);
+    return `<div class="about"><h3>About Me</h3>${book.portrait ? `<img src="/img/${book.portrait}" alt="">` : ""}<b>${esc(c.name)}</b><span>starring as ${book.story === "red" ? "Little Red" : "Jack"}</span>
+      <dl>${rows.map(([k, l]) => `<dt>${l}</dt><dd>${esc(c[k])}</dd>`).join("")}</dl>${c.more ? `<p>${esc(c.more)}</p>` : ""}</div>`;
+  }
+  const p = book.pages[i];
+  if (p.inside) return insideHtml(book);
+  const pl = p.place, b = pl.box;
+  const art = pl.mode === "framed" ? `<img src="${p.url}" alt="" style="left:${pl.art.left * 100}%;top:${pl.art.top * 100}%;width:${(pl.art.right - pl.art.left) * 100}%;height:${(pl.art.bottom - pl.art.top) * 100}%">` : `<img src="${p.url}" alt="">`;
+  const size = (v) => `${(v / 432) * 100}cqw`;
+  const lines = pl.lines.map((l) => `<span style="line-height:${size(pl.lineH)}">${esc(l.text)}</span>`).join("");
+  const sub = pl.sub ? `<small style="font-size:${size(pl.sub.size)};line-height:${size(pl.sub.lineH)}">${esc(pl.sub.text)}</small>` : "";
+  return `${art}<div class="words ${pl.font === "title" ? "title" : ""}" style="left:${b.left * 100}%;top:${b.top * 100}%;width:${(b.right - b.left) * 100}%;height:${(b.bottom - b.top) * 100}%;font-size:${size(pl.size)};${pl.mode === "framed" ? "background:none" : ""}">${lines}${sub}</div>`;
+}
+
+// The inside page, as printed: copyright and publisher, low on the page.
+function insideHtml(book) {
+  const year = new Date(book.finishedAt || book.createdAt).getFullYear();
+  const month = new Date(book.finishedAt || book.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  const tale = book.story === "red" ? "Retold from the traditional European fairy tale, after Charles Perrault and the Brothers Grimm." : "Retold from the traditional English fairy tale.";
+  return `<div class="inside"><h4>${esc(book.title)},<br>starring ${esc(book.child.name)}</h4>
+    <p>Text and illustrations copyright © ${year} ${esc(PUBLISHER)}. All rights reserved.</p>
+    <p>No part of this book may be reproduced, stored or shared in any form without written permission from the publisher.</p>
+    <p>${tale}</p><p>The pictures were made for this book with AI image tools, from a photo of its star, and checked page by page before printing.</p>
+    <p>Published by ${esc(PUBLISHER)}<br>bluebid.online</p><p>First edition, ${month}<br>Book no. ${book.id}</p></div>`;
+}
+const PUBLISHER = "Bluebid Books";
+// The reader shows the book as it prints: the inside page sits after the cover.
+const asPrinted = (book) => ({ ...book, pages: [book.pages[0], { n: "©", inside: true }, ...book.pages.slice(1)] });
+const pageName = (p) => (p.inside ? "Copyright page" : p.n === 1 ? "Cover" : `Page ${p.n}`);
+
+// On a wide screen the book opens flat: two pages, turned across the spine.
+function viewSpread(book) {
+  let at = 0, busy = false;
+  const last = book.pages.length + 1;      // pages, About Me, back cover
+  const maxAt = Math.ceil((last + 1) / 2); // the last spread has only its left page
+  const leftOf = (a) => 2 * a - 1, rightOf = (a) => 2 * a;
+  const t = book.timing || {};
+  const retried = book.pages.filter((p) => (p.attempts || []).filter((x) => !x.skipped).length > 1);
+  app.innerHTML = `<div class="row" style="justify-content:space-between"><h2>${esc(book.title)}, starring ${esc(book.child.name)}</h2><div class="row"><a class="btn ghost" href="#/print/${book.id}">Order a printed copy</a><a class="btn" href="/api/books/${book.id}/pdf">Download PDF</a></div></div>
+    <div class="spread" id="book" tabindex="0" aria-label="The book. Use the arrow keys to turn pages."></div>
+    <div class="readbar"><p class="note">Drag a page, or use the arrow keys.</p><div class="nav"><button class="btn ghost small" id="prev">Back</button><span id="pos" class="note" style="min-width:110px;text-align:center"></span><button class="btn ghost small" id="next">Next</button></div><p class="tryline note" id="tryline" aria-live="polite"></p>
+      <details style="justify-self:end"><summary>How this book was checked</summary><p class="scores">Made in ${t.totalMs ? (t.totalMs / 1000).toFixed(0) : "?"} seconds. Every picture was analysed. ${retried.length ? `${retried.length} ${retried.length === 1 ? "page was" : "pages were"} repainted: ${retried.map((p) => `page ${p.n}`).join(", ")}.` : "Every page passed the first time."}${t.outOfTime ? ` ${t.outOfTime} kept the best try when time ran out.` : ""}${t.costUsd != null ? ` Its API calls (${t.apiCalls?.images ?? "?"} image calls, retries included, and ${t.apiCalls?.checks ?? "?"} checks) cost ${usd(t.costUsd, 3)}; the book costs you $0.99.` : ""}</p></details></div>
+    <div class="strip wide">${book.pages.map((p, n) => p.inside ? `<button data-i="${n}" aria-label="Copyright page" style="background:var(--paper);color:var(--ink);font-size:13px">©</button>` : `<button data-i="${n}" aria-label="${pageName(p)}. ${esc(tryText(p))}"><img src="${p.url}?thumb=1" alt="" loading="lazy">${triesBadge(p)}</button>`).join("")}<button data-i="${book.pages.length}" aria-label="Back cover: About Me" style="background:var(--paper);color:var(--ink);font-size:10px;line-height:1.1">About Me</button></div>`;
+  const el = $("#book");
+  const face = (n, side) => (n >= 0 && n <= last ? `<div class="side ${side}">${pageHtml(book, n)}</div>` : "");
+  const state = (a) => (a === 0 ? "start" : a === maxAt ? "end" : "");
+  const settle = () => {
+    el.innerHTML = face(leftOf(at), "l") + face(rightOf(at), "r");
+    el.dataset.state = state(at);
+    const nums = [leftOf(at), rightOf(at)].filter((n) => n >= 0 && n <= last);
+    const name = (n) => (n === book.pages.length ? "Back cover" : n > book.pages.length ? "The End" : pageName(book.pages[n]));
+    $("#pos").textContent = nums.map(name).join(", ");
+    $("#tryline").innerHTML = nums.filter((n) => n < book.pages.length && !book.pages[n].inside).map((n) => `<b>${pageName(book.pages[n])}:</b> ${esc(tryText(book.pages[n]))}`).join("<br>");
+    $("#prev").disabled = at === 0; $("#next").disabled = at === maxAt;
+    app.querySelectorAll(".strip button").forEach((b) => b.setAttribute("aria-current", String(nums.includes(+b.dataset.i))));
+    busy = false;
+  };
+  // The leaf between two spreads: this spread's right page on its front, the next
+  // spread's left page on its back.
+  const build = (from, to) => {
+    const a = Math.min(from, to), b = Math.max(from, to);
+    el.innerHTML = face(leftOf(a), "l") + face(rightOf(b), "r") + `<div class="flip">${face(rightOf(a), "r")}${face(leftOf(b), "l")}</div>`;
+    return $(".flip", el);
+  };
+  const finish = (flip, angle, then) => {
+    let done = false;
+    const end = () => { if (done) return; done = true; then(); };
+    flip.classList.add("anim");
+    flip.addEventListener("transitionend", end, { once: true });
+    setTimeout(end, 850);
+    requestAnimationFrame(() => { flip.style.transform = `rotateY(${angle}deg)`; });
+  };
+  const go = (to) => {
+    if (busy || to === at || to < 0 || to > maxAt) return;
+    // A jump from the strip goes straight there; a single step turns the leaf.
+    if (CALM || Math.abs(to - at) > 1) { at = to; return settle(); }
+    busy = true;
+    el.dataset.state = state(to);
+    if (to > at) finish(build(at, to), -180, () => { at = to; settle(); });
+    else {
+      const flip = build(to, at);
+      flip.style.transform = "rotateY(-180deg)";
+      flip.getBoundingClientRect();
+      finish(flip, 0, () => { at = to; settle(); });
+    }
+  };
+  $("#prev").onclick = () => go(at - 1);
+  $("#next").onclick = () => go(at + 1);
+  app.querySelectorAll(".strip button").forEach((b) => (b.onclick = () => go(Math.ceil(+b.dataset.i / 2))));
+
+  let drag = null;
+  el.addEventListener("pointerdown", (e) => { if (!busy && !e.target.closest("a,button")) drag = { x: e.clientX, w: el.clientWidth / 2, dir: 0 }; });
+  addEventListener("pointermove", (e) => {
+    if (!drag || !$("#book")) return;
+    const dx = e.clientX - drag.x;
+    if (!drag.dir) {
+      if (Math.abs(dx) < 8) return;
+      drag.dir = dx < 0 ? 1 : -1;
+      const to = at + drag.dir;
+      if (to < 0 || to > maxAt) { drag = null; return; }
+      drag.to = to;
+      drag.flip = drag.dir > 0 ? build(at, to) : build(to, at);
+    }
+    drag.p = Math.min(1, Math.abs(dx) / (drag.w * 1.4));
+    const angle = drag.dir > 0 ? -180 * drag.p : -180 * (1 - drag.p);
+    drag.flip.style.transform = `rotateY(${angle}deg)`;
+  });
+  addEventListener("pointerup", () => {
+    if (!drag) return;
+    const d = drag; drag = null;
+    if (!d.flip || !$("#book")) return;
+    busy = true;
+    const commit = d.p > 0.3;
+    if (commit) el.dataset.state = state(d.to);
+    finish(d.flip, (d.dir > 0) === commit ? -180 : 0, () => { if (commit) at = d.to; settle(); });
+  });
+  settle();
+  book.pages.forEach((p) => { if (p.url) new Image().src = p.url; });
+}
+
+function viewReader(book) {
+  if (matchMedia("(min-width: 1000px)").matches) return viewSpread(book);
+  let i = 0, busy = false;
+  const count = book.pages.length + 2; // the pages, About Me, the back cover
+  const t = book.timing || {};
+  const retried = book.pages.filter((p) => (p.attempts || []).filter((a) => !a.skipped).length > 1);
+  app.innerHTML = `<div class="row" style="justify-content:space-between"><h2>${esc(book.title)}, starring ${esc(book.child.name)}</h2><div class="row"><a class="btn ghost" href="#/print/${book.id}">Order a printed copy</a><a class="btn" href="/api/books/${book.id}/pdf">Download PDF</a></div></div>
+    <div class="reader">
+      <div><div class="stack" id="stack" tabindex="0" aria-label="The book. Use the arrow keys to turn pages."></div>
+        <div class="nav"><button class="btn ghost small" id="prev">Back</button><span id="pos" class="note" style="min-width:96px;text-align:center"></span><button class="btn ghost small" id="next">Next</button></div><p class="tryline note" id="tryline" aria-live="polite"></p></div>
+      <div>
+        <p class="note">Drag a page, swipe, or use the arrow keys to turn it. This book stays on your shelf.</p>
+        <div class="strip">${book.pages.map((p, n) => p.inside ? `<button data-i="${n}" aria-label="Copyright page" style="background:var(--paper);color:var(--ink);font-size:13px">©</button>` : `<button data-i="${n}" aria-label="${pageName(p)}. ${esc(tryText(p))}"><img src="${p.url}?thumb=1" alt="" loading="lazy">${triesBadge(p)}</button>`).join("")}<button data-i="${book.pages.length}" aria-label="About Me" style="background:var(--paper);color:var(--ink);font-size:11px;line-height:1.1">About Me</button></div>
+        <details style="margin-top:20px"><summary>How this book was checked</summary>
+          <p class="scores">Made in ${t.totalMs ? (t.totalMs / 1000).toFixed(0) : "?"} seconds. Every picture was analysed. ${retried.length ? `${retried.length} ${retried.length === 1 ? "page was" : "pages were"} repainted: ${retried.map((p) => `page ${p.n}`).join(", ")}.` : "Every page passed the first time."}${t.outOfTime ? ` ${t.outOfTime} kept the best try when time ran out.` : ""}${t.costUsd != null ? ` Its API calls (${t.apiCalls?.images ?? "?"} image calls, retries included, and ${t.apiCalls?.checks ?? "?"} checks) cost ${usd(t.costUsd, 3)}; the book costs you $0.99.` : ""}</p>
+        </details>
+      </div>
+    </div>`;
+  const stack = $("#stack");
+  const leaf = (n, cls = "") => `<div class="leaf ${cls}">${pageHtml(book, n)}</div>`;
+  const label = (n) => (n === book.pages.length ? "Back cover" : n > book.pages.length ? "The End" : book.pages[n].inside ? "Copyright page" : `Page ${book.pages[n].n} of 20`);
+  const settle = () => {
+    stack.innerHTML = leaf(i);
+    $("#pos").textContent = label(i);
+    $("#tryline").innerHTML = i < book.pages.length && !book.pages[i].inside ? `<b>${pageName(book.pages[i])}:</b> ${esc(tryText(book.pages[i]))}` : "";
+    $("#prev").disabled = i === 0; $("#next").disabled = i === count - 1;
+    app.querySelectorAll(".strip button").forEach((b) => b.setAttribute("aria-current", String(+b.dataset.i === i)));
+    busy = false;
+  };
+  // Turning: the upper leaf swings around the spine and shows the leaf beneath.
+  const finish = (top, angle, then) => {
+    let done = false;
+    const end = () => { if (done) return; done = true; then(); };
+    top.classList.add("anim");
+    top.addEventListener("transitionend", end, { once: true });
+    setTimeout(end, 750);
+    requestAnimationFrame(() => { top.style.transform = `rotateY(${angle}deg)`; });
+  };
+  const turnTo = (target) => {
+    if (busy || target === i || target < 0 || target >= count) return;
+    if (CALM) { i = target; return settle(); }
+    busy = true;
+    if (target > i) {
+      stack.innerHTML = leaf(target) + leaf(i, "top");
+      finish($(".top", stack), -178, () => { i = target; settle(); });
+    } else {
+      stack.innerHTML = leaf(i) + leaf(target, "top");
+      const top = $(".top", stack);
+      top.style.transform = "rotateY(-178deg)";
+      top.getBoundingClientRect();
+      finish(top, 0, () => { i = target; settle(); });
+    }
+  };
+  $("#prev").onclick = () => turnTo(i - 1);
+  $("#next").onclick = () => turnTo(i + 1);
+  app.querySelectorAll(".strip button").forEach((b) => (b.onclick = () => turnTo(+b.dataset.i)));
+
+  // Dragging: the page follows the pointer, then finishes or falls back.
+  let drag = null;
+  stack.addEventListener("pointerdown", (e) => {
+    if (busy || e.target.closest("a,button")) return;
+    drag = { x: e.clientX, w: stack.clientWidth, dir: 0, top: null, moved: false };
+  });
+  addEventListener("pointermove", (e) => {
+    if (!drag || !$("#stack")) return;
+    const dx = e.clientX - drag.x;
+    if (!drag.dir) {
+      if (Math.abs(dx) < 8) return;
+      drag.dir = dx < 0 ? 1 : -1;
+      const target = i + drag.dir;
+      if (target < 0 || target >= count) { drag = null; return; }
+      drag.target = target;
+      stack.innerHTML = drag.dir > 0 ? leaf(target) + leaf(i, "top") : leaf(i) + leaf(target, "top");
+      drag.top = $(".top", stack);
+    }
+    const p = Math.min(1, Math.abs(dx) / drag.w);
+    drag.p = drag.dir > 0 ? p : 1 - p;
+    drag.top.style.transform = `rotateY(${-178 * drag.p}deg)`;
+  });
+  addEventListener("pointerup", () => {
+    if (!drag) return;
+    const d = drag; drag = null;
+    if (!d.top || !$("#stack")) return;
+    busy = true;
+    const commit = (d.dir > 0 ? d.p : 1 - d.p) > 0.3; // dragged far enough to turn
+    finish(d.top, (d.dir > 0) === commit ? -178 : 0, () => { if (commit) i = d.target; settle(); });
+  });
+  settle();
+  // Load the full pages ahead, so turning has no delay.
+  book.pages.forEach((p) => { if (p.url) new Image().src = p.url; });
+}
+
+// What a book costs us to make, against the $0.99 it costs you. Every OpenAI call
+// is logged with its tokens and priced (see lib/cost.js).
+function costCard(c) {
+  if (!c) return "";
+  if (!c.books) return `<div class="paper onpaper cost" style="grid-column:1/-1"><h3>What a book costs to make</h3><p class="note">Every API call is logged and priced. The average appears here after the first book.</p></div>`;
+  const p = c.parts, tot = p.firstTries + p.retries + p.checks || 1, margin = c.price - c.avg;
+  const seg = (v, col) => `<i style="width:${(v / tot) * 100}%;background:${col}"></i>`;
+  return `<div class="paper onpaper cost" style="grid-column:1/-1">
+    <h3>What a book costs to make</h3>
+    <div class="vs"><b>${usd(c.avg, 3)}</b><span>average API cost per book, over ${c.books} ${c.books === 1 ? "book" : "books"}</span><span class="note">You pay <b style="font:inherit;color:var(--ink)">${usd(c.price)}</b>: ${margin >= 0 ? `${usd(margin, 3)} left over per book` : `${usd(-margin, 3)} short per book`}.</span></div>
+    <div class="bar" role="img" aria-label="Average cost split: first tries ${usd(p.firstTries, 3)}, retries ${usd(p.retries, 3)}, checks ${usd(p.checks, 3)}">${seg(p.firstTries, "#2f8a57")}${seg(p.retries, "#e8b23a")}${seg(p.checks, "#5b6fb5")}</div>
+    <div class="key"><span style="--c:#2f8a57">Painting you in, first tries: ${usd(p.firstTries, 3)}</span><span style="--c:#e8b23a">Retries: ${usd(p.retries, 3)} (${c.calls.retries.toFixed(1)} a book)</span><span style="--c:#5b6fb5">Analysis checks: ${usd(p.checks, 3)} (${c.calls.checks.toFixed(0)} a book)</span></div>
+    <p class="note" style="margin-top:10px">Cheapest book ${usd(c.min, 3)}, dearest ${usd(c.max, 3)}. ${c.art.calls ? `Painting both stories' scenes and characters ahead of time cost ${usd(c.art.usd)} once, shared by every book. ` : ""}Priced from token counts at OpenAI's published rates (${esc(c.models.pages)} for pictures, ${esc(c.models.checks)} for checks), checked ${esc(c.pricesChecked)}.</p>
+  </div>`;
+}
+
+async function viewMoney(flash) {
+  if (!me?.user) return viewHome();
+  setSky(catalog?.stories[0]?.world, true);
+  app.innerHTML = `<p class="note">Opening your account</p>`;
+  try {
+    const [w, cost, { orders }] = await Promise.all([api("/api/wallet"), api("/api/costs").catch(() => null), api("/api/orders").catch(() => ({ orders: [] }))]);
+    me.balance = w.balance; drawTop();
+    const kindLabel = { deposit: "Added", book: "Book", book_refund: "Book not charged", refund: "Refund", refund_reversed: "Refund reversed", print: "Printed copy", print_refund: "Printed copy refunded" };
+    app.innerHTML = `<h2>Your purse</h2>${flash || ""}
+      <div class="money">
+        <div class="paper onpaper">
+          <div class="bignum">${money(w.balance)}</div>
+          <p class="note">${w.balance >= w.bookCents ? `Enough for ${Math.floor(w.balance / w.bookCents)} ${Math.floor(w.balance / w.bookCents) === 1 ? "book" : "books"}, at $0.99 each.` : "A book costs $0.99."}</p>
+          <h3 style="margin-top:24px">Add money</h3>
+          <div class="row" style="margin-top:10px">
+            ${[500, 1000, 2500].map((c) => `<button class="btn ghost" data-fund="${c}">${money(c)}</button>`).join("")}
+          </div>
+          <form id="other" class="row" style="margin-top:10px"><input type="number" id="amt" min="1" max="100" step="1" placeholder="Other, in dollars" aria-label="Other amount in dollars" style="flex:1;min-width:130px"><button class="btn ghost">Add</button></form>
+          <p class="note" style="margin-top:12px">This is Stripe's sandbox, so no real money moves. On Stripe's page, pay with card 4242 4242 4242 4242, any future date, and any CVC.</p>
+          <div id="merr"></div>
+          <h3 style="margin-top:26px">Get a refund</h3>
+          ${w.payments.length ? w.payments.map((p) => {
+            const left = Math.min(p.cents - p.refunded, w.balance);
+            return `<div style="border-bottom:1px solid var(--line);padding:9px 0"><div class="row" style="justify-content:space-between"><span>${money(p.cents)} on ${when(p.paid_at)}</span>
+              ${left >= 50 ? `<button class="linkish" data-open="${p.id}">Request a refund</button>` : `<span class="note">${p.refunded ? `${money(p.refunded)} refunded` : "Already spent"}</span>`}</div>
+              <form class="refund" data-refund="${p.id}" hidden>
+                <label style="margin:0" for="r${p.id}">Amount in dollars <small>up to ${money(left)}</small></label>
+                <input id="r${p.id}" type="number" step="0.01" min="0.50" max="${(left / 100).toFixed(2)}" value="${(left / 100).toFixed(2)}">
+                <label style="margin:0" for="rr${p.id}">Why? <small>optional</small></label><input id="rr${p.id}" type="text" maxlength="200">
+                <button class="btn small">Refund to my card</button>
+              </form></div>`; }).join("") : `<p class="note">Money you add can be refunded here, up to what's left in your balance.</p>`}
+          ${w.refunds.length ? `<h3 style="margin-top:22px">Refund requests</h3>${w.refunds.map((r) => `<p style="margin-top:8px"><b>${money(r.cents)}</b> ${r.status === "processed" ? "sent back to your card" : r.status === "failed" ? "failed, and the money is back in your balance" : "requested"}<br><span class="note">Requested ${when(r.requested_at)}${r.processed_at ? `, processed ${when(r.processed_at)}` : ""}${r.stripe_refund ? `. Stripe ${esc(r.stripe_refund)}` : ""}</span></p>`).join("")}` : ""}
+        </div>
+        <div class="paper onpaper">
+          <h3>Transaction history</h3>
+          ${w.ledger.length ? `<div class="tablewrap"><table class="table"><thead><tr><th>When</th><th>What caused it</th><th class="num">Amount</th><th class="num">Balance</th></tr></thead><tbody>
+            ${w.ledger.map((l) => `<tr><td>${whenLines(l.at)}</td><td><b>${kindLabel[l.kind] || esc(l.kind)}</b><br><span class="note">${l.bookId ? `<a href="#/book/${l.bookId}">${esc(l.cause)}</a>` : `${esc(l.cause)}${/^book/.test(l.kind) ? " (deleted from your shelf)" : ""}`}</span></td><td class="num ${l.cents > 0 ? "plus" : ""}">${l.cents > 0 ? "+" : "-"}${money(l.cents)}</td><td class="num">${money(l.balanceAfter)}</td></tr>`).join("")}
+          </tbody></table></div>` : `<p class="note" style="margin-top:8px">Every credit and debit appears here, with what caused it. Add money to start.</p>`}
+        </div>
+        ${costCard(cost)}
+        ${orders.length ? `<div class="paper onpaper" style="grid-column:1/-1"><h3>Printed copies</h3>${orders.map((o) => orderHtml(o).replace(`<b>Order #${o.id}`, `<b><a href="#/print/${o.bookId}">${esc(o.title)}</a> · Order #${o.id}`)).join("")}</div>` : ""}
+      </div>`;
+    const fund = async (cents) => {
+      try { const { url } = await post("/api/wallet/fund", { cents }); location.href = url; }
+      catch (e) { $("#merr").innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+    };
+    app.querySelectorAll("[data-fund]").forEach((b) => (b.onclick = () => { b.disabled = true; fund(+b.dataset.fund); }));
+    $("#other").onsubmit = (e) => { e.preventDefault(); fund(Math.round(+$("#amt").value * 100)); };
+    app.querySelectorAll("[data-open]").forEach((b) => (b.onclick = () => { const f = app.querySelector(`[data-refund="${b.dataset.open}"]`); f.hidden = !f.hidden; }));
+    app.querySelectorAll("[data-cancel]").forEach((b) => (b.onclick = async () => {
+      if (!b.dataset.sure) { b.dataset.sure = "1"; b.textContent = "Cancel it for good?"; return; }
+      b.disabled = true;
+      try { await post(`/api/orders/${b.dataset.cancel}/cancel`, {}); await refreshMe(); viewMoney(`<div class="ok">Order canceled. The money is back in your balance.</div>`); } catch (e) { b.textContent = e.message; }
+    }));
+    app.querySelectorAll("[data-refund]").forEach((f) => (f.onsubmit = async (e) => {
+      e.preventDefault();
+      const id = f.dataset.refund, btn = $("button", f);
+      btn.disabled = true; btn.textContent = "Refunding";
+      try {
+        const r = await post("/api/refunds", { paymentId: +id, cents: Math.round(+$(`#r${id}`).value * 100), reason: $(`#rr${id}`).value });
+        viewMoney(`<div class="ok">Refund processed: ${money(r.cents)} is on its way back to your card.</div>`);
+      } catch (err) { btn.disabled = false; btn.textContent = "Refund to my card"; $("#merr").innerHTML = `<div class="err">${esc(err.message)}</div>`; }
+    }));
+  } catch (e) { app.innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+}
+
+// A printed copy: check the PDF and approve it, then the address, then the price,
+// then the order. Nothing goes to the printer before the approval.
+const LULU_STATUS = {
+  CREATED: ["Received by the printer", ""], UNPAID: ["Received, waiting for the printer's payment step (sandbox)", ""],
+  PAYMENT_IN_PROGRESS: ["Being paid for at the printer", ""], PRODUCTION_DELAYED: ["Queued: printing starts within the hour", ""],
+  PRODUCTION_READY: ["Ready to print", "good"], IN_PRODUCTION: ["Printing", "good"], SHIPPED: ["Shipped", "good"],
+  REJECTED: ["The printer rejected the files, money back", "bad"], CANCELED: ["Canceled, money back", "bad"], ERROR: ["Problem at the printer", "bad"],
+};
+const STATES = "AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY".split(" ");
+function orderHtml(o) {
+  const [label, tone] = o.status === "failed" ? ["Not placed, money back", "bad"] : o.status === "canceled" ? ["Canceled, money back", "bad"] : LULU_STATUS[o.luluStatus] || [o.luluStatus || o.status, ""];
+  const a = o.address || {};
+  return `<div class="orderline"><div class="row" style="justify-content:space-between"><b>Order #${o.id} · ${money(o.price)}</b><span class="pill ${tone}">${esc(label)}</span></div>
+    <p class="note">${when(o.createdAt)} · to ${esc(a.name)}, ${esc(a.city)}, ${esc(a.state)} ${esc(a.zip)}${o.luluJobId ? ` · Lulu print job ${esc(o.luluJobId)}` : ""}</p>
+    ${o.luluMessage ? `<p class="note">${esc(o.luluMessage)}</p>` : ""}${o.error ? `<p class="note">${esc(o.error)}</p>` : ""}
+    ${o.tracking?.urls?.length ? `<p><a href="${esc(o.tracking.urls[0])}" target="_blank" rel="noopener">Track the parcel</a></p>` : ""}
+    ${o.canCancel ? `<button class="linkish" data-cancel="${o.id}">Cancel this order and get the money back</button>` : ""}</div>`;
+}
+
+async function viewPrint(id) {
+  if (!me?.user) return viewHome();
+  app.innerHTML = `<p class="note">Opening your book</p>`;
+  let book, info, costs;
+  try { [{ book }, info, costs] = await Promise.all([api(`/api/books/${id}`), api(`/api/books/${id}/print`), api("/api/costs").catch(() => null)]); }
+  catch (e) { app.innerHTML = `<div class="err">${esc(e.message)}</div>`; return; }
+  document.documentElement.style.setProperty("--story", COLORS[book.story]);
+  setSky(storyOf(book.story)?.world, true);
+  if (book.status !== "done") { app.innerHTML = `<div class="paper"><h2>This book isn't finished</h2><p>Only a finished book can be printed. <a href="#/book/${id}">Back to the book</a></p></div>`; return; }
+  const pdf = `/api/books/${id}/pdf`;
+  let quoted = null;
+  app.innerHTML = `<div class="row" style="justify-content:space-between"><h2>A printed copy of ${esc(book.title)}, starring ${esc(book.child.name)}</h2><a class="btn ghost small" href="#/book/${id}">Back to the book</a></div>
+    <div class="print">
+      <div class="paper onpaper" id="s1">
+        <div class="step ${info.approval ? "done" : ""}"><i>${info.approval ? "✓" : "1"}</i><h3>Check every page</h3></div>
+        <p class="note">This is exactly what gets printed. Page through all 22 pages: the cover, the copyright page, the story and the About Me on the back.</p>
+        <iframe class="pdfview" src="${pdf}?inline=1#view=FitH" title="The book's PDF"></iframe>
+        <p class="note"><a href="${pdf}?inline=1" target="_blank" rel="noopener">Open the PDF in a new tab</a> · <a href="${pdf}">Download it</a></p>
+        <ul class="prints note">
+          <li><b>Front cover:</b> ${esc(book.title)}, starring ${esc(book.child.name)}</li>
+          <li><b>Inside page:</b> copyright notice, published by ${esc(info.publisher)}</li>
+          <li><b>Pages 2 to 20:</b> the story, starting on the page after the copyright page</li>
+          <li><b>Back cover:</b> About Me</li>
+          <li><b>The book:</b> ${esc(info.product)}</li>
+        </ul>
+        <div id="approveBox">${info.approval
+          ? `<div class="ok">You approved this book on ${when(info.approval.approvedAt)}. This exact version is the one that prints.</div>`
+          : `<label class="check"><input type="checkbox" id="seen"> <span>I've looked at every page. The name, the pictures and the About Me are right, and I'm happy for this to be printed.</span></label>
+             <button class="btn" id="approve" disabled>Approve for printing</button>`}</div>
+        <div id="aerr"></div>
+      </div>
+      <div>
+        <div class="paper onpaper ${info.approval ? "" : "locked"}" id="s2">
+          <div class="step"><i>2</i><h3>Where should it go?</h3></div>
+          <form id="addr" novalidate>
+            <label for="a_name">Name</label><input type="text" id="a_name" maxlength="35" autocomplete="name" value="${esc(me.user.name || "")}">
+            <label for="a_street1">Street address</label><input type="text" id="a_street1" maxlength="35" autocomplete="address-line1">
+            <label for="a_street2">Apartment, suite <small>optional</small></label><input type="text" id="a_street2" maxlength="35" autocomplete="address-line2">
+            <div class="grid2">
+              <div><label for="a_city">City</label><input type="text" id="a_city" maxlength="35" autocomplete="address-level2"></div>
+              <div><label for="a_state">State</label><select id="a_state" autocomplete="address-level1"><option value="">-</option>${STATES.map((x) => `<option>${x}</option>`).join("")}</select></div>
+              <div><label for="a_zip">ZIP code</label><input type="text" id="a_zip" maxlength="10" inputmode="numeric" autocomplete="postal-code"></div>
+            </div>
+            <label for="a_phone">Phone <small>for the carrier, only if there's a delivery problem</small></label><input type="text" id="a_phone" maxlength="20" inputmode="tel" autocomplete="tel">
+            <label for="a_email">Email <small>for shipping updates</small></label><input type="text" id="a_email" maxlength="80" autocomplete="email" value="${esc(info.email || "")}">
+            <p class="note" style="margin-top:8px">US addresses only for now.</p>
+            <button class="btn" id="quote" style="margin-top:14px">See the price</button>
+          </form>
+          <div id="qerr"></div>
+        </div>
+        <div class="paper onpaper locked" id="s3" style="margin-top:20px">
+          <div class="step"><i>3</i><h3>Place the order</h3></div>
+          <div id="priceBox"><p class="note">A printed copy is ${money(info.price)}, shipping included. You'll see the full price after the address.</p></div>
+          <div id="oerr"></div>
+          <p class="sandbox">Printing runs in Lulu's sandbox and payment in Stripe's: the order is real to the app, but nothing is printed or shipped and no real money moves.</p>
+        </div>
+      </div>
+    </div>
+    <section class="band"><h2>Orders for this book</h2><div id="orders">${info.orders.length ? info.orders.map(orderHtml).join("") : `<p class="note">No printed copies yet.</p>`}</div></section>`;
+
+  const fields = ["name", "street1", "street2", "city", "state", "zip", "phone", "email"];
+  const address = () => Object.fromEntries(fields.map((f) => [f, $(`#a_${f}`).value]));
+  const mark = (err, box) => {
+    $(box).innerHTML = `<div class="err">${esc(err.message)}${err.status === 402 ? ` <a href="#/money" style="color:inherit;font-weight:700">Add money</a>` : ""}</div>`;
+    const el = err.field && $(`#a_${err.field}`);
+    if (el) { el.classList.add("bad"); el.focus(); el.addEventListener("input", () => el.classList.remove("bad"), { once: true }); }
+  };
+  const unlockAddress = () => { $("#s2").classList.remove("locked"); };
+  const bindCancel = () => app.querySelectorAll("[data-cancel]").forEach((b) => (b.onclick = async () => {
+    if (!b.dataset.sure) { b.dataset.sure = "1"; b.textContent = "Cancel it for good?"; return; }
+    b.disabled = true;
+    try { await post(`/api/orders/${b.dataset.cancel}/cancel`, {}); await refreshMe(); viewPrint(id); } catch (e) { b.textContent = e.message; }
+  }));
+  bindCancel();
+
+  if (!info.approval) {
+    $("#seen").onchange = (e) => { $("#approve").disabled = !e.target.checked; };
+    $("#approve").onclick = async () => {
+      $("#approve").disabled = true; $("#approve").textContent = "Approving";
+      try {
+        const r = await post(`/api/books/${id}/approve`, { hash: info.hash });
+        $("#approveBox").innerHTML = `<div class="ok">Approved. This exact version is the one that prints.</div>`;
+        $("#s1 .step").classList.add("done"); $("#s1 .step i").textContent = "✓";
+        info.approval = { approvedAt: r.approvedAt };
+        unlockAddress(); $("#a_street1").focus();
+      } catch (e) { $("#aerr").innerHTML = `<div class="err">${esc(e.message)}</div>`; $("#approve").disabled = false; $("#approve").textContent = "Approve for printing"; }
+    };
+  }
+
+  $("#addr").onsubmit = async (e) => {
+    e.preventDefault();
+    $("#qerr").innerHTML = ""; const btn = $("#quote");
+    btn.disabled = true; btn.textContent = "Asking the printer";
+    try {
+      quoted = await post(`/api/books/${id}/quote`, { address: address() });
+      const q = quoted.quote, gen = costs?.avg || 0, total = q.total + gen;
+      const enough = me.balance >= quoted.price;
+      $("#s3").classList.remove("locked");
+      $("#priceBox").innerHTML = `<div class="vs" style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><b style="font:700 40px/1 Fraunces,Georgia,serif">${money(quoted.price)}</b><span>for one printed copy, shipped by standard mail to ${esc(quoted.address.city)}, ${esc(quoted.address.state)}</span></div>
+        <p class="note" style="margin-top:6px">Paid from your balance (${money(me.balance)}). ${quoted.pageCount}-page interior plus the cover, ${esc(info.product)}.</p>
+        <details style="margin-top:12px"><summary>Where the money goes</summary>
+          <table class="table math" style="margin-top:8px"><tbody>
+            <tr><td>Printing the book (Lulu)</td><td class="num">${usd(q.book)}</td></tr>
+            <tr><td>Shipping to this address</td><td class="num">${usd(q.shipping)}</td></tr>
+            ${q.fulfillment ? `<tr><td>Lulu's handling fee</td><td class="num">${usd(q.fulfillment)}</td></tr>` : ""}${q.fees ? `<tr><td>Other Lulu fees</td><td class="num">${usd(q.fees)}</td></tr>` : ""}
+            <tr><td>Sales tax Lulu charges us</td><td class="num">${usd(q.tax)}</td></tr>
+            ${gen ? `<tr><td>Painting the book (average API cost; already paid by the $0.99)</td><td class="num">${usd(gen)}</td></tr>` : ""}
+            <tr class="sum"><td>What this copy costs us</td><td class="num">${usd(q.total)}</td></tr>
+            <tr><td>You pay</td><td class="num">${money(quoted.price)}</td></tr>
+            <tr class="sum"><td>Our margin on the printed copy</td><td class="num">${usd(quoted.margin)} (${Math.round((quoted.margin / (quoted.price / 100)) * 100)}%)</td></tr>
+          </tbody></table>${q.mock ? `<p class="note">Sample figures: this server has no Lulu keys.</p>` : `<p class="note">Live quote from Lulu's print-job cost calculator.</p>`}</details>
+        <div style="margin-top:16px">${enough ? `<button class="btn big" id="place">Place order for ${money(quoted.price)}</button>` : `<p style="margin-bottom:10px">Your balance is ${money(me.balance)}, so add money first. Nothing has been charged.</p><a class="btn" href="#/money">Add money</a>`}</div>`;
+      $("#place")?.addEventListener("click", place);
+      $("#s3").scrollIntoView({ behavior: CALM ? "auto" : "smooth", block: "center" });
+    } catch (err) { mark(err, "#qerr"); }
+    btn.disabled = false; btn.textContent = "See the price";
+  };
+
+  async function place() {
+    const b = $("#place"); b.disabled = true; b.textContent = "Sending to the printer";
+    $("#oerr").innerHTML = "";
+    try {
+      const o = await post(`/api/books/${id}/orders`, { address: address(), price: quoted.price });
+      await refreshMe();
+      $("#priceBox").innerHTML = `<div class="ok"><b>Order #${o.id} placed.</b> ${money(o.price)} came out of your balance, and Lulu has print job ${esc(o.luluJobId || "")}. Its status is below.</div>`;
+      const list = await api(`/api/books/${id}/print`);
+      $("#orders").innerHTML = list.orders.map(orderHtml).join(""); bindCancel();
+      dropCoins();
+    } catch (err) { mark(err, "#oerr"); b.disabled = false; b.textContent = `Place order for ${money(quoted.price)}`; await refreshMe(); }
+  }
+}
+
+function route() {
+  stream?.close();
+  document.documentElement.style.removeProperty("--story");
+  const [, a, b] = location.hash.split("/");
+  window.scrollTo(0, 0);
+  if (a === "new") return viewNew(b);
+  if (a === "book") return viewBook(+b);
+  if (a === "money") return viewMoney();
+  if (a === "print") return viewPrint(+b);
+  viewHome();
+}
+addEventListener("hashchange", () => swap(route));
+addEventListener("keydown", (e) => {
+  if (e.target.matches("input,textarea")) return;
+  if (e.key === "ArrowRight") $("#next")?.click();
+  if (e.key === "ArrowLeft") $("#prev")?.click();
+});
+
+// The page draws at once; the catalog and sign-in state fill in behind it.
+viewHome();
+fetch("/catalog.json").then((r) => r.json()).then((c) => { catalog = c; route(); });
+refreshMe().then(async () => {
+  const params = new URLSearchParams(location.search);
+  const funded = params.get("funded");
+  if (funded && me?.user) {
+    history.replaceState(null, "", "/#/money");
+    try { await post("/api/wallet/confirm", { sessionId: funded }); await refreshMe(); await viewMoney(`<div class="ok">Money added. Your balance is ${money(me.balance)}.</div>`); dropCoins(); return; } catch {}
+  }
+  if (params.get("signin")) history.replaceState(null, "", "/" + location.hash);
+  route();
+});
+</script>
+</body>
+</html>
