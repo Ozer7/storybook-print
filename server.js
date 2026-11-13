@@ -60,7 +60,7 @@ app.get("/catalog.json", (_req, res) => {
       // A peek inside before buying: a few real pages of the book, with their words.
       const samples = [1, 4, 7, 10, 14, 17, 20].map((n) => {
         const sc = sceneFor(s.key, n), page = s.pages[n - 1];
-        return sc ? { n, image: Number(sc.image_id), text: page.title ? s.title : pageWords(page, s.defaultPronoun) } : null;
+        return sc ? { n, image: showcaseFor(s.key, `showcase-p${n}`) || Number(sc.image_id), text: page.title ? s.title : pageWords(page, s.defaultPronoun) } : null;
       }).filter(Boolean);
       return { key: s.key, title: s.title, role: s.role, pronoun: s.defaultPronoun, ready: storyReady(s.key), samples, cover: showcaseFor(s.key) || (cover ? Number(cover.image_id) : null), world: showcaseFor(s.key, "showcase-world") || (world ? Number(world.image_id) : null) };
     }),
