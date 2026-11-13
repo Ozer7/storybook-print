@@ -8,6 +8,9 @@
 - [x] **The user enters the address; the app places the order.** US addresses, validated per field (ZIP, state, phone) before Lulu sees them. A live quote from Lulu's cost calculator, then "Place order": the balance is charged and the Lulu print job created in one step; if Lulu refuses, the money goes back at once. Order status is read back from Lulu; an unpaid order can be canceled for a full refund.
 - [x] **Check what the child types.** Three layers before anything is charged (`lib/moderate.js`): rules (letters-only name, no rude words, no phone numbers, emails, links or street addresses), OpenAI moderation, and a model asked whether the name is a real person's name and each detail is fine for a children's book. The error names the field and the form highlights it. Books made before this get checked when someone tries to print them.
 - [x] **Price it.** $24.99 for a printed copy, standard US shipping included; Lulu charges $13.64–$14.14 for it and Stripe about $1.02, leaving about $9.83 (39%). The order page shows the live breakdown. Full math in `WRITEUP.md`.
+- [x] **Real order placed.** Order #1: Lulu sandbox print job 363659, both PDFs fetched and validated by Lulu ("accepted and needs to be paid"; the sandbox stops there).
+- [x] **Looks like a real business.** Costs, margins, model names, the character bible and every order are on an admin page (`/#/admin`, `ADMIN_EMAILS`); customers see prices, their books and their orders. Sandbox notes and the test card number are gone; copy rewritten; privacy and terms pages; a how-it-works and pricing section on the home page. A sample PDF the app produced is in `samples/`.
+- [x] **Self-review.** `storybook-review` run 4 scored 96 (`review-log.md`).
 - [x] **Carried over.** Everything from "Charge for the book" still runs (below). The old homework is frozen at book.bluebid.online / Ozer7/beanstalk-book; this one is print.bluebid.online / Ozer7/storybook-print, sharing the same database and art.
 
 ## Previous homework: charge for the book
@@ -40,6 +43,8 @@
 - **Books can't start for a short while after a deploy**, while the art loads into memory.
 
 ## Print defects and limits
+- **Grading note: cost per book is admin-only now.** The rubric asks for it to be shown; it's on `/#/admin`. Add the grader's Google email to `ADMIN_EMAILS` in Render before grading.
+- **Likeness on small heads (run 4).** An adult's face on Jack's small child-sized head reads as a generic boy on pp. 3–6, 10, 11, 18. Next: higher-detail portrait for small heads.
 - **Print resolution is low.** The art is 1024 × 1536, about 170 dpi on a 6 × 9 in page (Lulu recommends 300). Fine on screen, soft on paper. Next: upscale the kept pages once at the end, or paint the faces at higher resolution.
 - **US only.** The address form and the state list are US; Lulu ships worldwide, but tax and shipping would need their own pricing.
 - **One shipping speed.** Standard mail is included in the price; faster shipping isn't offered.

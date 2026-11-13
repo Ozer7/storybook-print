@@ -645,7 +645,7 @@ function qualityHtml(book) {
   const pages = book.pages.filter((p) => !p.inside && !p.ahead);
   const redone = pages.filter((p) => triesOf(p) > 1);
   return `<details class="quality"><summary>Quality check</summary><p class="scores">Every illustration is reviewed as soon as it's painted, and redone if anything looks off (up to ${MAX_TRIES} tries, keeping the best). ${redone.length ? `${redone.length} ${redone.length === 1 ? "page was" : "pages were"} redone:` : "Every page passed on the first try."}</p>
-    ${redone.length ? `<ul class="scores" style="margin:6px 0 0;padding-left:20px">${redone.map((p) => `<li>${pageName(p)}: ${esc(tryText(p))}</li>`).join("")}</ul>` : ""}</details>`;
+    ${redone.length ? `<ul class="scores" style="margin:6px 0 0;padding-left:20px">${redone.map((p) => `<li>${pageName(p)}: ${p.passed === false ? `kept the best of ${triesOf(p)} tries` : `passed on try ${p.kept ?? triesOf(p)} of ${MAX_TRIES}`}</li>`).join("")}</ul>` : ""}</details>`;
 }
 
 // The inside page, as printed: copyright and publisher, low on the page.
@@ -1112,6 +1112,8 @@ function route() {
   document.documentElement.style.removeProperty("--story");
   const [, a, b] = location.hash.split("/");
   window.scrollTo(0, 0);
+  // Signed-in pages wait for the sign-in check, so a link opened right after signing in lands where it should.
+  if (me === undefined && ["new", "book", "money", "print", "admin"].includes(a)) { app.innerHTML = `<p class="note">Loading…</p>`; return; }
   if (a === "new") return viewNew(b);
   if (a === "book") return viewBook(+b);
   if (a === "money") return viewMoney();

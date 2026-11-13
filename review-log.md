@@ -73,3 +73,29 @@ Fix first:
 3. Cost is $0.60 a book, 61% of the $0.99 price; retries add about $0.08 a book (no points).
 4. An adult's head on the story's child-sized body reads oddly at close range; the template's heroes are children (no points; a product decision).
 5. Red p2's words are set small because its clear band is short (carried over from run 1; no points).
+
+## Run 4 — 2026-11-13 — reviewer: self — browser: Claude's built-in browser
+Total 96 (was 99)
+PDF 36/40 · UI 20/20 · Money 20/20 · Engineering 20/20
+Upload 01:06:44 → PDF 01:07:31 (about 47 s; server timing 45.8 s), Little Red Riding Hood, book #24 (pp. 3, 16, 17 passed on try 2)
+Upload 01:09:34 → PDF ready by 01:10:19 (under 45 s; server timing 41.2 s), Jack and the Beanstalk, book #25 (p11 passed on try 2; p7 had no passing try and kept its best, score 55)
+Balance: 12.70 → fund 100.00 → 112.70 → printed copy (order #1) 87.71 → generate 86.72 → generate 85.73 → refund 85.00 → 0.73 → generate refused (402, "Your balance is $0.73 and a book costs $0.99, so nothing was charged"), balance stays 0.73
+Avg cost per book: $0.587 over 10 books (price $0.99): first tries $0.490, retries $0.058, checks $0.039 (now on the admin page, see Fix first 3)
+Photo: a new AI-generated face from thispersondoesnotexist.com (a man of about 45, short dark hair), never used before. Name "Michael", boy, About Me: 45, fixing up old cars, pizza, a firefighter.
+Not measured: none. Deviations: no private window in the built-in browser, so the run started signed in (the sign-out / sign-in step was done in the same tab); the builder entered the 4242 test card on Stripe's page for the $100.00 funding.
+Changed since run 3: this homework. The PDF is now laid out as a book (front cover "starring Michael", copyright page published by Bluebid Books, story from the next page, About Me on the back cover). The About Me details are checked before any charge. Printed copies can be ordered through Lulu's sandbox. Costs, margins and model names moved to an admin page; customer-facing copy rewritten; sandbox notes removed.
+
+Evidence:
+- PDF. Each PDF has 22 pages: cover (story page 1), copyright page, story pages 2–20, About Me back cover. So it still has 20 story pages plus About Me (pdf.js page count and text on every page). Same template and text zones in both books. Text over a face: none on any of the 44 pages, checked one by one at 190 px wide. Fonts are embedded Andika and Fraunces (pdffonts), and a 400% crop of Red p3 is crisp type. Red: Michael is plainly the same man on pp. 1, 10 and 20. Jack: he's recognisable on pp. 7, 14, 16, 17 and the back cover, but on the small-head pages (3, 4, 5, 6, 10, 11, 18) he reads as a generic young boy (likeness −3). The heads on Red pp. 1, 7, 9 and 15 look more photographic than the paint around them (style −1). About Me shows "Michael", "starring as Little Red/Jack" and all four details.
+- Checks on what's typed (before any charge, balance unchanged at $87.71): "Poopy Head" refused by the rules layer; "Mickey Mouse" refused by the model ("famous cartoon character"); "My brother is a total loser lol" in Anything else refused, naming the field.
+- Printing. Order #1 (Sam's Red book): approved on the page, a bad ZIP (4 digits) refused before Lulu saw it, $24.99 charged, Lulu print job 363659. Lulu fetched both PDFs and reports "Print-job was accepted and needs to be paid. Line Item was successfully validated." Sandbox stops at unpaid.
+- UI. Home loaded in 240 ms (navigation timing; first paint 516 ms). Progress names each stage: "Reading your photo", "Painting the portrait", "Illustrating the pages: n of 20 done", "Touching up 3 pages", "Binding your book". Thumbnails landed one at a time: 4 at 31 s, 8 at 34 s, 14 at 36 s, 19 at 43 s, 20 at 47 s. Live "try 2/3" on slots 3, 16 and 17 while they were redone. The reader's "Quality check" lists every redone page ("Page 7: kept the best of 2 tries"). At 400 px the form has no sideways scroll (scrollWidth 400) and the header is one line (59 px).
+- Money. +$100.00 (pi_3UbDIRD77uFrOgI50GvliNUV). Each book −$0.99 exactly. Refund $85.00 (re_3UbDIRD77uFrOgI50iQdVPTi) processed in about 1 s; the top-bar balance updated without a reload. History: 34 rows with cause, amount and time; they sum to $0.73, the balance, and every running balance checks.
+- Engineering. Both books under 60 s. Signed out: PDF 401. Signed back in: book #14 from Nov 8 downloads (7.6 MB, 1.9 s). Bible at /bible and /bible.json. Attempt counts live on the painting screen and in the reader's Quality check. No keys in the repo (.env is ignored; the Lulu keys and Stripe key live in Render's environment).
+
+Fix first:
+1. Likeness drifts in Jack on the small-head pages: Michael reads as a generic young boy on pp. 3, 4, 5, 6, 10, 11, 18 (PDF likeness, −3). The template's heroes are children, and an adult's face painted onto a small child's head loses its features. Next: pass the portrait at higher detail for small heads, or crop tighter around the head before the edit.
+2. Photographic heads on Red pp. 1, 7, 9, 15 (PDF style, −1). Carried over from run 3. Next: paint the portrait at medium quality and soften the blended head to the page's texture.
+3. The average cost per book is now on the admin page only. A grader using the site as a customer won't see it (Money, −3 at risk). Fix: add the grader's email to ADMIN_EMAILS before grading, or point them at the write-up.
+4. The short-balance message still said "Add money in your purse" after the page was renamed "Your account" (UI, 0). Fixed after this run.
+5. Opening a deep link (#/book/25) right after signing in showed the home page until a reload (UI, 0; a race with the sign-in check). Fixed after this run.

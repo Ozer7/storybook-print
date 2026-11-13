@@ -2,6 +2,7 @@
 
 **Live:** https://print.bluebid.online (forwards to https://storybook-print.onrender.com)
 **Repo:** https://github.com/Ozer7/storybook-print
+**A PDF it produced:** https://github.com/Ozer7/storybook-print/blob/main/samples/little-red-riding-hood-michael.pdf
 **Previous homework, frozen:** https://book.bluebid.online and https://github.com/Ozer7/beanstalk-book
 
 ## What I did
@@ -27,6 +28,10 @@ The reader on the site shows the copyright page in the same place. The printer g
 3. **A small model** answers two questions: could this name be a real person's name, and is each detail fine for a children's book? This catches "Poopy Head", "Stinky", "Mickey Mouse", an epithet in another language, or an insult aimed at a sibling.
 
 The error names the field, and the form highlights it. Books made before this homework are checked when someone tries to print them.
+
+**A real order.** Order #1 went to Lulu's sandbox as print job 363659. Lulu downloaded both PDFs and validated them; the sandbox stops at "unpaid".
+
+**Ready for customers.** The figures below are for the owner. They're on an admin page (`/#/admin`, only for the accounts in `ADMIN_EMAILS`), along with every order, the cost of each book and the character bible. Customers see prices, their books and their orders. There are no sandbox notes, no test card number and no model names on the public pages, and there are privacy and terms pages.
 
 ## Price: $24.99 for a printed copy, shipped
 
@@ -89,4 +94,4 @@ Everything from "Charge for the book" still works:
 - the quality loop with try counts
 - the API cost per book
 
-`storybook-review` was run again and appended to `review-log.md`. Known defects are in `to-do.md`.
+`storybook-review` run 4 scored 96, appended to `review-log.md`. Known defects are in `to-do.md`.
