@@ -62,7 +62,7 @@ app.get("/catalog.json", (_req, res) => {
         const sc = sceneFor(s.key, n), page = s.pages[n - 1];
         return sc ? { n, image: Number(sc.image_id), text: page.title ? s.title : pageWords(page, s.defaultPronoun) } : null;
       }).filter(Boolean);
-      return { key: s.key, title: s.title, role: s.role, pronoun: s.defaultPronoun, ready: storyReady(s.key), samples, cover: showcaseFor(s.key) || (cover ? Number(cover.image_id) : null), world: (s.key === "red" && showcaseFor(s.key)) || (world ? Number(world.image_id) : null) };
+      return { key: s.key, title: s.title, role: s.role, pronoun: s.defaultPronoun, ready: storyReady(s.key), samples, cover: showcaseFor(s.key) || (cover ? Number(cover.image_id) : null), world: showcaseFor(s.key, "showcase-world") || (world ? Number(world.image_id) : null) };
     }),
   });
 });
