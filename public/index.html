@@ -39,8 +39,23 @@ header{display:flex;align-items:center;gap:16px;padding:18px 0}
 .logo svg{width:26px;height:26px}
 .row{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
 /* On a phone the header stays one line: logo left, purse and Sign out right. */
-@media (max-width:480px){header{gap:10px;padding:14px 0}.logo{font-size:20px;gap:7px}.logo svg{width:22px;height:22px}#who{flex-wrap:nowrap;gap:10px}#who .purse{padding:3px 11px 3px 6px;font-size:15px}#who .linkish{font-size:15px;white-space:nowrap}}
+@media (max-width:480px){header{gap:10px;padding:14px 0}.logo{font-size:20px;gap:7px}.logo svg{width:22px;height:22px}#who{flex-wrap:nowrap;gap:10px}#who .purse{padding:3px 11px 3px 6px;font-size:15px}#who .linkish{font-size:15px;white-space:nowrap}.avatar{width:26px;height:26px;font-size:13px}}
 .linkish{background:none;border:0;padding:4px 2px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+/* Header: balance pill and an account menu */
+.pillbtn{display:inline-flex;align-items:center;font-weight:700;font-size:15px;text-decoration:none;background:rgba(13,18,50,.6);backdrop-filter:blur(8px);border-radius:999px;padding:6px 14px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)}
+.pillbtn:hover{background:rgba(13,18,50,.85)}
+.menu{position:relative}
+.menu summary{list-style:none;display:flex;align-items:center;gap:4px;cursor:pointer;background:rgba(13,18,50,.6);backdrop-filter:blur(8px);border-radius:999px;padding:3px 9px 3px 3px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)}
+.menu summary::-webkit-details-marker{display:none}
+.menu[open] summary,.menu summary:hover{background:rgba(13,18,50,.88)}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--gold);color:#241a02;display:grid;place-items:center;font-weight:700;font-size:15px;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.menupop{position:absolute;right:0;top:calc(100% + 8px);min-width:220px;background:var(--paper);color:var(--ink);border-radius:12px;padding:8px;box-shadow:0 18px 40px rgba(0,0,0,.45);z-index:30;display:grid}
+.menupop .who{padding:8px 10px 10px;border-bottom:1px solid var(--edge);margin-bottom:6px;font-weight:700;display:grid;line-height:1.3}
+.menupop .who small{font-weight:400;color:var(--soft);font-size:13px;word-break:break-all}
+.menupop a,.menupop button{display:block;text-align:left;text-decoration:none;background:none;border:0;border-radius:8px;padding:9px 10px;cursor:pointer;font-size:16px}
+.menupop a:hover,.menupop button:hover{background:#f3ead6}
+.menupop button{color:#9b2430}
 .purse{display:inline-flex;align-items:center;gap:8px;font-weight:700;text-decoration:none;background:rgba(13,18,50,.6);backdrop-filter:blur(8px);border-radius:999px;padding:4px 14px 4px 8px;white-space:nowrap;position:relative}
 .purse svg{width:24px;height:24px}
 .coin{position:absolute;left:14px;top:-70px;width:14px;height:14px;border-radius:50%;background:var(--gold);box-shadow:inset -2px -2px 0 #b98718;animation:coin .75s cubic-bezier(.5,0,.9,.6) both}
@@ -70,10 +85,16 @@ footer a:hover{background:rgba(43,52,104,.9);transform:translateY(-1px)}
 .pitch h1,.pitch h2{font-size:clamp(40px,5.6vw,74px);line-height:1.02;letter-spacing:-.018em;text-shadow:0 2px 26px rgba(10,14,40,.65);max-width:11ch}
 .pitch p{max-width:36ch;font-size:clamp(17px,1.6vw,20px);color:#e8ecf8;text-shadow:0 1px 12px rgba(10,14,40,.8)}
 .duo{display:grid;grid-template-columns:repeat(2,minmax(0,auto));justify-content:center;gap:clamp(22px,5vw,64px);perspective:1500px}
-.bookwrap{position:relative}
+.bookwrap{position:relative;display:grid;justify-items:center;gap:30px}
+.pick{display:grid;gap:18px;justify-items:center}
+.pickhint{display:inline-flex;align-items:center;gap:8px;font:700 18px Fraunces,Georgia,serif;background:rgba(13,18,50,.62);backdrop-filter:blur(8px);border-radius:999px;padding:8px 18px;box-shadow:inset 0 0 0 1px rgba(232,178,58,.45)}
+.pickhint svg{color:var(--gold);animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateY(4px)}}
+.startbtn{font-size:16px;padding:11px 22px;white-space:nowrap}
+.bookwrap .book3d{outline-offset:6px}
 body:not(.risen) .bookwrap{animation:rise .9s cubic-bezier(.2,.8,.2,1) both}
 body:not(.risen) .bookwrap:nth-child(2){animation-delay:.14s}
-.bookwrap:after{content:"";position:absolute;left:4%;right:4%;bottom:-26px;height:34px;background:radial-gradient(closest-side,rgba(5,8,28,.75),transparent);z-index:-1}
+.bookwrap:after{content:"";position:absolute;left:4%;right:4%;bottom:38px;height:34px;background:radial-gradient(closest-side,rgba(5,8,28,.75),transparent);z-index:-1}
 @keyframes rise{from{transform:translateY(46px);opacity:0}to{transform:none;opacity:1}}
 .book3d{--w:clamp(132px,21vw,282px);--d:15px;--rx:3deg;--ry:21deg;width:var(--w);aspect-ratio:2/3;position:relative;transform-style:preserve-3d;transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .5s cubic-bezier(.2,.8,.2,1);display:block;text-decoration:none;background:none;border:0;padding:0;cursor:pointer;color:#fff}
 .book3d.live{transition:transform .08s linear}
@@ -230,9 +251,70 @@ details{margin-top:16px}summary{cursor:pointer;font-weight:700}
 .prices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
 .prices>div{display:grid;gap:2px;background:var(--paper);color:var(--ink);border-radius:14px;padding:20px 22px}
 .prices b{font:700 38px/1.05 Fraunces,Georgia,serif}.prices span{font-weight:700}.prices small{color:var(--soft);font-size:15px}
-.admin .stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:10px}
-.admin .stat div{background:#fff;border-radius:10px;padding:12px 14px}.admin .stat b{display:block;font:700 26px/1.1 Fraunces,Georgia,serif}.admin .stat span{color:var(--soft);font-size:14px}
-.admin .table{font-size:14.5px}
+/* Admin */
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.gate{max-width:420px;margin:clamp(20px,6vh,60px) auto;background:var(--paper);color:var(--ink);border-radius:18px;padding:34px 30px 26px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.45);display:grid;gap:12px}
+.gateicon{width:64px;height:64px;border-radius:50%;margin:0 auto 4px;display:grid;place-items:center;color:#241a02;background:linear-gradient(#f6cc63,#e4a92f);box-shadow:0 8px 22px rgba(232,178,58,.45)}
+.gate form{display:grid;gap:12px;margin-top:6px}
+.pwbox{display:flex;align-items:center;background:#fff;border:1.5px solid #d8caa9;border-radius:12px;padding:0 6px 0 14px}
+.pwbox:focus-within{border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,178,58,.25)}
+.pwbox input{flex:1;border:0;outline:0;background:none;padding:13px 0;font-size:17px;color:var(--ink)}
+.pwbox button{background:none;border:0;color:var(--soft);cursor:pointer;padding:8px;border-radius:8px}
+.pwbox button:hover{background:#f3ead6}
+.gate .btn{width:100%}
+.gatefoot{font-size:13px;color:var(--soft)}
+.dash{display:grid;gap:18px}
+.dashhead{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.dashhead .note{color:var(--mist);margin-top:6px}
+.dashhead .btn{display:inline-flex;align-items:center;gap:6px}
+.tabs{display:flex;gap:6px;background:rgba(13,18,50,.6);backdrop-filter:blur(8px);border-radius:999px;padding:5px;width:max-content;max-width:100%;overflow-x:auto}
+.tabs button{border:0;background:none;color:var(--mist);font-weight:700;padding:8px 16px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.tabs button em{font-style:normal;font-size:12px;background:rgba(255,255,255,.14);border-radius:999px;padding:1px 7px;margin-left:4px}
+.tabs button[aria-selected="true"]{background:var(--paper);color:var(--ink)}
+.tabs button[aria-selected="true"] em{background:#efe4c8}
+.dash section{display:grid;gap:18px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.kpi{background:var(--paper);color:var(--ink);border-radius:14px;padding:16px 18px;display:grid;gap:2px;box-shadow:0 10px 24px rgba(0,0,0,.28)}
+.kpi span{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--soft)}
+.kpi b{font:700 30px/1.15 Fraunces,Georgia,serif}
+.kpi small{color:var(--soft);font-size:13.5px}
+.kpi.hero{background:linear-gradient(160deg,#fff3cf,#f6d77d)}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.card{background:var(--paper);color:var(--ink);border-radius:14px;padding:18px 20px;box-shadow:0 10px 24px rgba(0,0,0,.28)}
+.card h3{font-size:18px;margin-bottom:10px}
+.card.flush{padding:6px 0}
+.card.empty{text-align:center;color:var(--soft);padding:34px}
+.lines{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.lines li{display:flex;justify-content:space-between;gap:12px;font-size:15.5px}
+.lines li span:last-child{font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
+.lines.quiet{margin-top:12px;padding-top:10px;border-top:1px solid var(--edge)}
+.lines.quiet li{color:var(--soft)}.lines.quiet li span:last-child{color:var(--ink);font-weight:400}
+.bar{display:block;height:7px;border-radius:99px;background:#efe6d2;overflow:hidden;margin:2px 0 8px}
+.bar i{display:block;height:100%;border-radius:99px}
+.bar .jack{background:var(--jack)}.bar .red{background:var(--red)}.bar .ink{background:#7c879d}.bar .gold{background:var(--gold)}
+.sect{color:var(--paper);margin-top:4px}
+.sectnote{color:var(--mist)}
+.prod{background:var(--paper);color:var(--ink);border-radius:14px;padding:18px 20px;box-shadow:0 10px 24px rgba(0,0,0,.28);display:grid;gap:10px}
+.prodhead{display:flex;justify-content:space-between;align-items:baseline}
+.prodhead span{font-weight:700}.prodhead b{font:700 28px Fraunces,Georgia,serif}
+.prod ul{list-style:none;margin:0;padding:0;display:grid;gap:4px;font-size:15px;color:var(--soft)}
+.prod li{display:flex;justify-content:space-between}.prod li span:last-child{color:var(--ink);font-variant-numeric:tabular-nums}
+.marg{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--edge);padding-top:10px}
+.marg b{font:700 22px Fraunces,Georgia,serif}.marg small{font:700 14px Andika,sans-serif;color:var(--soft)}
+.marg .pos{color:#1b6b3c}.marg .neg{color:#a1242e}
+.dt{width:100%;border-collapse:collapse;font-size:15px}
+.dt th{text-align:left;font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--soft);padding:10px 16px;border-bottom:1px solid var(--edge)}
+.dt td{padding:12px 16px;border-bottom:1px solid #f0e7d4;vertical-align:top}
+.dt tr:last-child td{border-bottom:0}
+.dt tbody tr:hover{background:#fbf4e3}
+.dt td small{display:block;color:var(--soft);font-size:13px;margin-top:2px}
+.dt td small.plain{display:inline;margin:0}
+.dt .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill.info{background:#e9eefb;color:#25407a}
+.chip{display:inline-block;font-size:12.5px;font-weight:700;background:#f1e8d3;border-radius:6px;padding:1px 7px;margin:0 4px 4px 0}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin:0 5px 0 4px;vertical-align:1px}
+code{font-size:13px;background:#f1e8d3;border-radius:5px;padding:1px 5px}
+@media (max-width:760px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.cols{grid-template-columns:minmax(0,1fr)}.kpi b{font-size:25px}.dt th,.dt td{padding:10px 12px}}
 /* A printed copy */
 .print{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:clamp(20px,4vw,40px);align-items:start;margin-top:14px}
 .step{display:flex;align-items:center;gap:10px;margin-bottom:10px}
@@ -323,10 +405,19 @@ const post = (path, body) => api(path, { method: "POST", body: JSON.stringify(bo
 
 function drawTop() {
   $("#who").className = "row";
+  const initial = esc((me?.user?.name || me?.user?.email || "?").trim()[0]?.toUpperCase() || "?");
   $("#who").innerHTML = me?.user
-    ? `<a class="linkish" href="#/admin">Admin</a><a class="purse" id="purse" href="#/money" title="Your account">${PURSE}${money(me.balance)}</a><button class="linkish" id="out">Sign out</button>`
-    : me === null ? `<a class="linkish" href="#/admin">Admin</a><a class="btn small" href="/auth/google">Sign in with Google</a>` : "";
+    ? `<a class="purse" id="purse" href="#/money" title="Your account">${PURSE}${money(me.balance)}</a>
+       <details class="menu"><summary aria-label="Account menu"><span class="avatar">${me.user.avatar ? `<img src="${esc(me.user.avatar)}" alt="" referrerpolicy="no-referrer">` : initial}</span><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></summary>
+         <div class="menupop"><p class="who">${esc(me.user.name || "")}<small>${esc(me.user.email || "")}</small></p>
+           <a href="#/">Your books</a><a href="#/money">Account and balance</a><a href="#/admin">Admin</a><button id="out">Sign out</button></div></details>`
+    : me === null ? `<a class="pillbtn" href="#/admin">Admin</a><a class="btn small" href="/auth/google">Sign in</a>` : "";
   $("#out")?.addEventListener("click", async () => { await post("/auth/logout", {}); me = null; location.hash = "#/"; drawTop(); route(); });
+  const menu = $("#who .menu");
+  if (menu) {
+    menu.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => menu.removeAttribute("open")));
+    document.addEventListener("click", (e) => { if (!menu.contains(e.target)) menu.removeAttribute("open"); });
+  }
 }
 async function refreshMe() {
   try { const r = await api("/api/me"); me = r.user ? r : null; } catch { me = null; }
@@ -412,7 +503,8 @@ function viewHome() {
         <p>We paint your child into every page of a classic fairy tale. Read it on screen for $0.99, then order a printed paperback for the bookshelf.</p>
         ${me === null ? `<div class="row"><a class="btn big" href="/auth/google">Get started</a>${catalog?.devLogin ? `<a class="btn ghost" href="/auth/dev">Dev sign-in</a>` : ""}</div>` : ""}`}
       </div>
-      <div class="duo">${stories.map((s) => `<div class="bookwrap">${bookCard(s, signedIn ? `#/new/${s.key}` : "/auth/google")}</div>`).join("")}</div>
+      <div class="pick"><p class="pickhint"><span>${signedIn ? "Start here: choose a story" : "Choose a story to begin"}</span><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 4v15m0 0l-6-6m6 6l6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></p>
+      <div class="duo">${stories.map((s) => { const href = signedIn ? `#/new/${s.key}` : "/auth/google"; return `<div class="bookwrap">${bookCard(s, href)}<a class="btn startbtn" href="${href}" style="--bk:${COLORS[s.key]}">Start ${esc(s.title.replace(/^Little /, ""))} <span aria-hidden="true">→</span></a></div>`; }).join("")}</div></div>
     </div>
     ${signedIn ? `<section class="band"><h2>Your books</h2><div id="books" class="shelf"><p class="note">Loading your books…</p></div></section>` : ""}
     <section class="how">
@@ -1049,76 +1141,114 @@ async function viewPrint(id) {
 }
 
 // The owner's page: money in and out, what books and printed copies cost, every order.
+const ICON = {
+  lock: '<svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5" fill="currentColor"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>',
+  eye: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>',
+};
+let adminTab = "overview";
 async function viewAdmin() {
   setSky(catalog?.stories[0]?.world, true);
   app.innerHTML = `<p class="note">Loading…</p>`;
   const st = await api("/api/admin/status").catch(() => ({ admin: false, passwordSet: true }));
   if (!st.admin) {
-    app.innerHTML = `<div class="paper onpaper" style="max-width:420px;margin:30px auto">
-      <h2>Admin</h2><p class="note">Enter the admin password to see sales, costs and orders.</p>
-      <form id="alogin" style="margin-top:14px"><label for="apw">Password</label><input type="password" id="apw" autocomplete="current-password" required>
-      <button class="btn" style="margin-top:14px">Unlock</button></form><div id="aerr"></div></div>`;
+    app.innerHTML = `<div class="gate">
+      <div class="gateicon">${ICON.lock}</div>
+      <h2>Owner dashboard</h2>
+      <p class="note">Sales, costs and print orders for Storybook. Enter the admin password to continue.</p>
+      <form id="alogin">
+        <label for="apw" class="sr">Admin password</label>
+        <div class="pwbox"><input type="password" id="apw" placeholder="Admin password" autocomplete="current-password" required><button type="button" id="peek" aria-label="Show password">${ICON.eye}</button></div>
+        <button class="btn" id="unlock">Unlock dashboard</button>
+      </form>
+      <div id="aerr"></div>
+      <p class="gatefoot">${st.passwordSet ? "Three wrong tries pause sign-in for 10 seconds." : "No admin password is set on this server yet."}</p>
+    </div>`;
     $("#apw").focus();
+    $("#peek").onclick = () => { const i = $("#apw"); i.type = i.type === "password" ? "text" : "password"; i.focus(); };
     $("#alogin").onsubmit = async (e) => {
       e.preventDefault();
-      const btn = e.target.querySelector("button"); btn.disabled = true;
+      const btn = $("#unlock"); btn.disabled = true; btn.textContent = "Checking…";
       try { await post("/api/admin/login", { password: $("#apw").value }); viewAdmin(); }
-      catch (err) { $("#aerr").innerHTML = `<div class="err">${esc(err.message)}</div>`; btn.disabled = false; $("#apw").select(); }
+      catch (err) { $("#aerr").innerHTML = `<div class="err">${esc(err.message)}</div>`; btn.disabled = false; btn.textContent = "Unlock dashboard"; $("#apw").select(); }
     };
     return;
   }
   let a;
   try { a = await api("/api/admin/summary"); } catch (e) { app.innerHTML = `<div class="err">${esc(e.message)}</div>`; return; }
-  const r = a.revenue, c = a.costs, sold = r.books + r.prints;
-  const avgLulu = a.orders.filter((o) => o.status === "sent" && o.quote).map((o) => Number(o.quote.total));
-  const lulu = avgLulu.length ? avgLulu.reduce((x, y) => x + y, 0) / avgLulu.length : null;
+  const r = a.revenue, c = a.costs;
   const stripe = (cents) => cents * 0.029 / 100 + 0.30;
-  const bookMargin = 0.99 - c.avg - stripe(99), printMargin = lulu != null ? a.pricing.print / 100 - lulu - stripe(a.pricing.print) : null;
-  const statusOf = (o) => (o.status === "failed" ? "Not placed" : o.status === "canceled" ? "Canceled" : (LULU_STATUS[o.luluStatus] || [o.luluStatus])[0]);
-  app.innerHTML = `<div class="row" style="justify-content:space-between"><h2>Admin</h2><button class="btn ghost small" id="alock">Lock</button></div>
-    <div class="money admin">
-      <div class="paper onpaper" style="grid-column:1/-1"><h3>Money</h3>
-        <div class="stat">
-          <div><b>${money(r.deposits)}</b><span>Added by customers (${r.depositCount} payments)</span></div>
-          <div><b>${money(r.refundsToCards)}</b><span>Refunded to cards</span></div>
-          <div><b>${money(r.books)}</b><span>Digital books (${r.booksSold})</span></div>
-          <div><b>${money(r.prints)}</b><span>Printed copies (${r.printsSold})</span></div>
-          <div><b>${money(r.luluCost)}</b><span>Owed to Lulu for those copies</span></div>
-          <div><b>${money(r.stripeFees)}</b><span>Stripe fees (est. 2.9% + 30¢)</span></div>
-          <div><b>${usd(c.avg * c.books)}</b><span>API spend on ${c.books} books</span></div>
-          <div><b>${usd(sold / 100 - r.luluCost / 100 - r.stripeFees / 100 - c.avg * c.books)}</b><span>Profit on sales so far</span></div>
+  const luluTotals = a.orders.filter((o) => o.status === "sent" && o.quote).map((o) => Number(o.quote.total));
+  const lulu = luluTotals.length ? luluTotals.reduce((x, y) => x + y, 0) / luluTotals.length : null;
+  const sales = (r.books + r.prints) / 100, api$ = c.avg * c.books, costs = r.luluCost / 100 + r.stripeFees / 100 + api$, profit = sales - costs;
+  const bookCost = c.avg + stripe(99), printCost = lulu != null ? lulu + stripe(a.pricing.print) : null;
+  const statusOf = (o) => (o.status === "failed" ? ["Not placed", "bad"] : o.status === "canceled" ? ["Canceled", "bad"] : LULU_STATUS[o.luluStatus] ? [LULU_STATUS[o.luluStatus][0], LULU_STATUS[o.luluStatus][1] || "info"] : [o.luluStatus || o.status, "info"]);
+  const bar = (part, whole, cls) => `<span class="bar"><i class="${cls}" style="width:${Math.max(2, Math.min(100, (part / whole) * 100)).toFixed(1)}%"></i></span>`;
+  const product = (name, price, rows, cost) => {
+    const margin = cost == null ? null : price - cost;
+    return `<div class="prod"><div class="prodhead"><span>${name}</span><b>${usd(price)}</b></div>
+      <ul>${rows.map(([k, v]) => `<li><span>${k}</span><span>${v == null ? "–" : usd(v, v < 1 ? 3 : 2)}</span></li>`).join("")}</ul>
+      ${margin == null ? `<p class="note">No orders yet to price it.</p>` : `<div class="marg"><span>Margin</span><b class="${margin >= 0 ? "pos" : "neg"}">${usd(margin)} <small>${Math.round((margin / price) * 100)}%</small></b></div>${bar(Math.max(margin, 0), price, "gold")}`}</div>`;
+  };
+  const tabs = [["overview", "Overview"], ["orders", `Print orders <em>${a.orders.length}</em>`], ["books", `Books <em>${a.books.length}</em>`], ["system", "System"]];
+  app.innerHTML = `<div class="dash">
+    <div class="dashhead"><div><h2>Owner dashboard</h2><p class="note">${a.counts.users} customers · ${a.counts.books} books made · Stripe and Lulu in test mode</p></div>
+      <button class="btn ghost small" id="alock">${ICON.lock.replace('width="30" height="30"', 'width="16" height="16"')} Lock</button></div>
+    <nav class="tabs" role="tablist">${tabs.map(([k, l]) => `<button role="tab" data-tab="${k}" aria-selected="${adminTab === k}">${l}</button>`).join("")}</nav>
+
+    <section data-panel="overview">
+      <div class="kpis">
+        <div class="kpi"><span>Sales</span><b>${usd(sales)}</b><small>${r.booksSold} books · ${r.printsSold} printed copies</small></div>
+        <div class="kpi"><span>Costs</span><b>${usd(costs)}</b><small>printing, card fees, AI</small></div>
+        <div class="kpi hero"><span>Profit</span><b>${usd(profit)}</b><small>${sales ? Math.round((profit / sales) * 100) : 0}% of sales</small></div>
+        <div class="kpi"><span>Customer balances</span><b>${usd((r.deposits - r.refundsToCards - r.books - r.prints) / 100)}</b><small>added but not yet spent</small></div>
+      </div>
+      <div class="cols">
+        <div class="card"><h3>Where sales come from</h3>
+          <ul class="lines">
+            <li><span>Digital books</span><span>${usd(r.books / 100)}</span></li>${bar(r.books, Math.max(1, r.books + r.prints), "jack")}
+            <li><span>Printed copies</span><span>${usd(r.prints / 100)}</span></li>${bar(r.prints, Math.max(1, r.books + r.prints), "red")}
+          </ul>
+          <ul class="lines quiet"><li><span>Added by customers (${r.depositCount} payments)</span><span>${usd(r.deposits / 100)}</span></li><li><span>Refunded to cards</span><span>${usd(r.refundsToCards / 100)}</span></li></ul>
         </div>
-        <p class="note" style="margin-top:10px">${a.counts.users} accounts, ${a.counts.books} finished books. Stripe and Lulu run in sandbox / test mode.</p>
+        <div class="card"><h3>Where costs go</h3>
+          <ul class="lines">
+            <li><span>Printing and shipping (Lulu)</span><span>${usd(r.luluCost / 100)}</span></li>${bar(r.luluCost / 100, Math.max(0.01, costs), "ink")}
+            <li><span>AI illustration (${c.books} books)</span><span>${usd(api$)}</span></li>${bar(api$, Math.max(0.01, costs), "ink")}
+            <li><span>Card fees (Stripe, estimated)</span><span>${usd(r.stripeFees / 100)}</span></li>${bar(r.stripeFees / 100, Math.max(0.01, costs), "ink")}
+          </ul>
+        </div>
       </div>
-      <div class="paper onpaper"><h3>Unit economics</h3>
-        <table class="table math" style="margin-top:8px"><tbody>
-          <tr class="sum"><td>Digital book</td><td class="num">$0.99</td></tr>
-          <tr><td>Average API cost per book (${c.books} books)</td><td class="num">${usd(c.avg, 3)}</td></tr>
-          <tr><td>First tries / retries / checks</td><td class="num">${usd(c.parts.firstTries, 3)} / ${usd(c.parts.retries, 3)} / ${usd(c.parts.checks, 3)}</td></tr>
-          <tr><td>Stripe on $0.99 alone</td><td class="num">${usd(stripe(99))}</td></tr>
-          <tr><td>Margin</td><td class="num">${usd(bookMargin)}</td></tr>
-          <tr class="sum"><td>Printed copy</td><td class="num">${money(a.pricing.print)}</td></tr>
-          <tr><td>Lulu: print, ship, fee, tax (avg of orders)</td><td class="num">${lulu != null ? usd(lulu) : "no orders yet"}</td></tr>
-          <tr><td>Stripe on ${money(a.pricing.print)}</td><td class="num">${usd(stripe(a.pricing.print))}</td></tr>
-          <tr><td>Margin</td><td class="num">${printMargin != null ? `${usd(printMargin)} (${Math.round((printMargin / (a.pricing.print / 100)) * 100)}%)` : "-"}</td></tr>
-        </tbody></table>
-        <p class="note" style="margin-top:8px">Cheapest book ${usd(c.min, 3)}, dearest ${usd(c.max, 3)}. ${c.art.usd > 0 ? `Painting the shared scenes cost ${usd(c.art.usd)} once. ` : ""}Models: ${esc(c.models.pages)} (pictures), ${esc(c.models.checks)} (checks); prices checked ${esc(c.pricesChecked)}.</p>
+      <h3 class="sect">What each sale earns</h3>
+      <div class="cols">
+        ${product("Digital book", 0.99, [["AI illustration (average)", c.avg], ["Card fee on $0.99", stripe(99)]], bookCost)}
+        ${product("Printed copy", a.pricing.print / 100, [["Lulu: print, ship, fee, tax", lulu], [`Card fee on ${money(a.pricing.print)}`, stripe(a.pricing.print)]], printCost)}
       </div>
-      <div class="paper onpaper"><h3>Printer</h3>
-        <p class="note">${esc(a.printer.product)}<br>SKU ${esc(a.printer.pod)} · ${esc(a.printer.base)}${a.printer.configured ? "" : " · not configured"}</p>
-        <p style="margin-top:12px"><a href="/bible" target="_blank" rel="noopener">Character bible and page art</a></p>
+      <p class="note sectnote">AI cost per book ranges ${usd(c.min, 3)}–${usd(c.max, 3)}: first tries ${usd(c.parts.firstTries, 3)}, redone pages ${usd(c.parts.retries, 3)}, quality checks ${usd(c.parts.checks, 3)}.</p>
+    </section>
+
+    <section data-panel="orders">
+      ${a.orders.length ? `<div class="card flush"><div class="tablewrap"><table class="dt"><thead><tr><th>Order</th><th>Customer</th><th>Status</th><th class="num">Price</th><th class="num">Lulu</th><th class="num">Margin</th></tr></thead><tbody>
+        ${a.orders.map((o) => { const [label, tone] = statusOf(o); return `<tr><td><b>#${o.id}</b><small>${when(o.createdAt)}${o.luluJobId ? ` · Lulu ${esc(o.luluJobId)}` : ""}</small></td><td>${esc(o.address?.name || "")}<small>${esc(o.email)}</small></td><td><span class="pill ${tone}">${esc(label)}</span></td><td class="num">${money(o.price)}</td><td class="num">${o.quote ? usd(o.quote.total) : "–"}</td><td class="num"><b>${o.margin != null ? usd(o.margin) : "–"}</b></td></tr>`; }).join("")}
+      </tbody></table></div></div>` : `<div class="card empty"><p>No print orders yet.</p></div>`}
+    </section>
+
+    <section data-panel="books">
+      <div class="card flush"><div class="tablewrap"><table class="dt"><thead><tr><th>Book</th><th>Customer</th><th>Status</th><th class="num">Made in</th><th class="num">AI cost</th><th>Pages redone</th></tr></thead><tbody>
+        ${a.books.map((b) => `<tr><td><b>#${b.id}</b> <span class="dot" style="background:${COLORS[b.story]}"></span>${b.story === "red" ? "Little Red" : "Jack"}<small>starring ${esc(b.name)} · ${when(b.createdAt)}</small></td><td><small class="plain">${esc(b.email)}</small></td><td><span class="pill ${b.status === "done" ? "good" : b.status === "failed" ? "bad" : "info"}">${b.status === "done" ? "Finished" : b.status === "failed" ? "Failed" : "Making"}</span></td><td class="num">${b.seconds != null ? `${b.seconds} s` : "–"}</td><td class="num">${b.usd != null ? usd(b.usd, 3) : "–"}</td><td>${b.retried.length ? b.retried.map((p) => `<span class="chip">p${p.n}${p.tries > 2 ? ` ×${p.tries}` : ""}</span>`).join("") : `<span class="note">none</span>`}</td></tr>`).join("")}
+      </tbody></table></div></div>
+    </section>
+
+    <section data-panel="system">
+      <div class="cols">
+        <div class="card"><h3>Printing</h3><ul class="lines quiet"><li><span>Product</span><span>${esc(a.printer.product)}</span></li><li><span>Lulu SKU</span><span><code>${esc(a.printer.pod)}</code></span></li><li><span>API</span><span>${esc(a.printer.base.replace("https://", ""))}${a.printer.configured ? "" : " (not set up)"}</span></li></ul></div>
+        <div class="card"><h3>AI models</h3><ul class="lines quiet"><li><span>Illustrations</span><span><code>${esc(c.models.pages)}</code></span></li><li><span>Quality checks</span><span><code>${esc(c.models.checks)}</code></span></li><li><span>Prices last checked</span><span>${esc(c.pricesChecked)}</span></li></ul>
+          <p style="margin-top:12px"><a href="/bible" target="_blank" rel="noopener">Open the character bible →</a></p></div>
       </div>
-      <div class="paper onpaper" style="grid-column:1/-1"><h3>Print orders</h3>
-        ${a.orders.length ? `<div class="tablewrap"><table class="table"><thead><tr><th>Order</th><th>Customer</th><th>Status</th><th class="num">Price</th><th class="num">Lulu</th><th class="num">Stripe</th><th class="num">Margin</th></tr></thead><tbody>
-          ${a.orders.map((o) => `<tr><td>#${o.id}<br><span class="note">${when(o.createdAt)}${o.luluJobId ? ` · Lulu ${esc(o.luluJobId)}` : ""}</span></td><td>${esc(o.email)}<br><span class="note">${esc(o.title)}</span></td><td>${esc(statusOf(o))}${o.luluMessage ? `<br><span class="note">${esc(o.luluMessage)}</span>` : ""}</td><td class="num">${money(o.price)}</td><td class="num">${o.quote ? usd(o.quote.total) : "-"}</td><td class="num">${usd(o.stripe)}</td><td class="num">${o.margin != null ? usd(o.margin) : "-"}</td></tr>`).join("")}
-        </tbody></table></div>` : `<p class="note">No orders yet.</p>`}
-      </div>
-      <div class="paper onpaper" style="grid-column:1/-1"><h3>Latest books</h3>
-        <div class="tablewrap"><table class="table"><thead><tr><th>Book</th><th>Customer</th><th>Status</th><th class="num">Time</th><th class="num">API cost</th><th>Pages redone (tries)</th></tr></thead><tbody>
-          ${a.books.map((b) => `<tr><td>#${b.id} ${b.story === "red" ? "Red" : "Jack"}<br><span class="note">${esc(b.name)} · ${when(b.createdAt)}</span></td><td>${esc(b.email)}</td><td>${esc(b.status)}</td><td class="num">${b.seconds != null ? `${b.seconds} s` : "-"}</td><td class="num">${b.usd != null ? usd(b.usd, 3) : "-"}</td><td>${b.retried.length ? b.retried.map((p) => `p${p.n} (${p.tries})`).join(", ") : "none"}</td></tr>`).join("")}
-        </tbody></table></div>
-      </div>
-    </div>`;
+    </section>
+  </div>`;
+  const show = (k) => { adminTab = k; app.querySelectorAll("[data-panel]").forEach((p) => (p.hidden = p.dataset.panel !== k)); app.querySelectorAll("[data-tab]").forEach((t) => t.setAttribute("aria-selected", t.dataset.tab === k)); };
+  app.querySelectorAll("[data-tab]").forEach((t) => (t.onclick = () => show(t.dataset.tab)));
+  show(adminTab);
   $("#alock").onclick = async () => { await post("/api/admin/logout", {}); viewAdmin(); };
 }
 
