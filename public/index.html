@@ -546,8 +546,8 @@ function viewHome() {
   app.innerHTML = `
     <div class="stage">
       <div class="pitch">
-        ${signedIn ? `<h1>Which story is next?</h1><p>Pick a book and add a photo. It's ready to read in about a minute.</p>` : `<h1>Your child, the hero of the story.</h1>
-        <p>A classic fairy tale with your child painted into every page. Read it on screen, then order a printed copy.</p>
+        ${signedIn ? `<h1>${me.user.name ? `Welcome back, ${esc(me.user.name.split(" ")[0])}.` : "Welcome back."}</h1><p>Every story needs a hero. Choose a book, add a photo, and we'll paint your little one into every page.</p>` : `<h1>Your child, the hero of the story.</h1>
+        <p>A classic fairy tale, beautifully illustrated with your child on every page. Read it tonight, and keep a printed copy for years to come.</p>
         ${me === null ? `<div class="row"><a class="btn big" href="/auth/google">Get started</a>${catalog?.devLogin ? `<a class="btn ghost" href="/auth/dev">Dev sign-in</a>` : ""}</div>` : ""}`}
       </div>
       <div class="pick"><p class="pickhint"><span>Choose a story</span><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 4v15m0 0l-6-6m6 6l6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></p>
@@ -555,8 +555,8 @@ function viewHome() {
     </div>
     ${`<section class="howrow" aria-label="How it works">
       <div><i>1</i><b>Choose a story</b><span>Jack and the Beanstalk or Little Red Riding Hood</span></div>
-      <div><i>2</i><b>Add a photo</b><span>One clear photo and a few details for the back cover</span></div>
-      <div><i>3</i><b>Read, then print</b><span>$0.99 to read online · $24.99 for a printed paperback, shipped</span></div>
+      <div><i>2</i><b>Add a photo</b><span>One clear photo, plus a few fun facts for the back cover</span></div>
+      <div><i>3</i><b>Read it, then keep it</b><span>Read online for $0.99, or get a printed paperback for $24.99, shipping included</span></div>
     </section>`}
     ${signedIn ? `<section class="band"><h2>Your books</h2><div id="books" class="shelf"><p class="note">Loading your books…</p></div></section>` : ""}
     `;
@@ -581,7 +581,7 @@ async function drawShelf() {
       const s = { key: b.story, title: b.title, cover: null };
       return `<div class="item"><a class="book3d tiny" href="#/book/${b.id}" aria-label="Open ${esc(b.title)}, starring ${esc(b.child.name)}"><span class="rear"></span><span class="spine" style="--bk:${COLORS[b.story]}"></span><span class="pages"></span><span class="front">${url ? `<img src="${url}?thumb=1" alt="">` : `<span class="painting">${b.status === "failed" ? "This one couldn't be made" : "Being painted"}</span>`}<span class="title">${esc(s.title)}</span></span></a>
         <small>Starring ${esc(b.child.name)}<br>${when(b.createdAt)}${b.status === "done" ? `<br><a href="/api/books/${b.id}/pdf">Download PDF</a>` : ""}${b.status !== "running" ? `<br><button class="linkish" data-del="${b.id}">Delete</button>` : ""}</small></div>`;
-    }).join("") : `<p class="note">Your finished books live here, ready to read or download again. Pick a story above to make your first.</p>`;
+    }).join("") : `<p class="note">Your books will live here, ready to read again whenever you like. Choose a story above to make your first one.</p>`;
     // Two clicks: the first asks, the second deletes.
     box.querySelectorAll("[data-del]").forEach((btn) => (btn.onclick = async () => {
       if (!btn.dataset.sure) { btn.dataset.sure = "1"; btn.textContent = "Delete this book for good?"; return; }
@@ -607,7 +607,7 @@ function viewNew(key) {
           <img id="ph" alt="" hidden>
           <input id="photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" required>
         </label>
-        <p class="note" style="max-width:26ch">Use a clear, well-lit photo of one person looking at the camera.</p>
+        <p class="note" style="max-width:26ch">A clear, bright photo of one face looking at the camera works best.</p>
         <p id="lastrow"></p>
       </div>
       <div class="rightp">
@@ -615,11 +615,11 @@ function viewNew(key) {
         <label for="name">First name</label>
         <input id="name" name="name" type="text" maxlength="40" required autocomplete="off">
         <input type="hidden" id="same" name="samePhoto" value="">
-        <label>Is the star a boy or a girl?</label>
-        <div class="seg" role="radiogroup" aria-label="Is the star a boy or a girl?">
+        <label>Is your star a boy or a girl?</label>
+        <div class="seg" role="radiogroup" aria-label="Is your star a boy or a girl?">
           ${[["he", "Boy"], ["she", "Girl"]].map(([v, l]) => `<label><input type="radio" name="pronoun" value="${v}" ${v === s.pronoun ? "checked" : ""}>${l}</label>`).join("")}
         </div>
-        <details><summary>About Me details for the back cover <span class="note" style="font-weight:400">(optional)</span></summary>
+        <details><summary>Add an About Me page for the back cover <span class="note" style="font-weight:400">(optional)</span></summary>
           <label for="age">Age</label><input id="age" name="age" type="text" maxlength="20">
           <label for="likes">Favourite thing to do</label><input id="likes" name="likes" type="text" maxlength="60">
           <label for="food">Favourite food</label><input id="food" name="food" type="text" maxlength="60">
@@ -631,7 +631,7 @@ function viewNew(key) {
           ${s.ready ? (enough
             ? `<button class="btn big" id="go">Create my book · $0.99</button><p class="note" style="margin-top:8px">Your balance is ${money(me.balance)}.</p>`
             : `<p style="margin-bottom:10px">A book costs $0.99, and your balance is ${money(me.balance)}.</p><a class="btn big" href="#/money">Add money</a>`)
-            : `<p class="note">This story isn't available right now. Please check back in a few minutes.</p>`}
+            : `<p class="note">This story will be ready again shortly. Please check back in a few minutes.</p>`}
         </div>
       </div>
       ${s.cover && !CALM ? `<div class="swing" aria-hidden="true"><img src="/art/${s.cover}?thumb=1" alt=""><span class="t">${esc(s.title)}</span><div></div></div>` : ""}
@@ -703,11 +703,11 @@ function viewMaking(book) {
   app.innerHTML = `<div class="making">
     <div>${climbSvg(book.story)}</div>
     <div class="status">
-      <h2 id="stage" aria-live="polite">Reading your photo</h2>
+      <h2 id="stage" aria-live="polite">Looking at your photo</h2>
       <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="barw"><i id="bar" style="width:2%"></i></div>
       <div class="row note" style="justify-content:space-between"><span id="clock">0 seconds</span><span>${esc(book.title)}, starring ${esc(book.child.name)}</span></div>
       <div class="easel">
-        <div class="fresh" id="fresh">Your first page will appear here.</div>
+        <div class="fresh" id="fresh">Your first page is on its way.</div>
         <div class="slots">${Array.from({ length: 20 }, (_, i) => `<div class="slot" id="s${i + 1}">${i + 1}</div>`).join("")}</div>
         <p class="legend">Every picture is checked as it's painted. The number on each page is the try that's on it, out of ${MAX_TRIES}. A page that fails the check is painted again; if all ${MAX_TRIES} tries have problems, the best one is kept and marked ★.</p>
       </div>
@@ -808,7 +808,7 @@ function viewSpread(book) {
   const retried = book.pages.filter((p) => (p.attempts || []).filter((x) => !x.skipped).length > 1);
   app.innerHTML = `<div class="row" style="justify-content:space-between"><h2>${esc(book.title)}, starring ${esc(book.child.name)}</h2><div class="row"><a class="btn ghost" href="#/print/${book.id}">Order a printed copy</a><a class="btn" href="/api/books/${book.id}/pdf">Download PDF</a></div></div>
     <div class="spread" id="book" tabindex="0" aria-label="The book. Use the arrow keys to turn pages."></div>
-    <div class="readbar"><p class="note">Drag a page or use the arrow keys.</p><div class="nav"><button class="btn ghost small" id="prev">Back</button><span id="pos" class="note" style="min-width:110px;text-align:center"></span><button class="btn ghost small" id="next">Next</button></div><span id="tryline" hidden></span>
+    <div class="readbar"><p class="note">Drag a corner or use the arrow keys to turn the page.</p><div class="nav"><button class="btn ghost small" id="prev">Back</button><span id="pos" class="note" style="min-width:110px;text-align:center"></span><button class="btn ghost small" id="next">Next</button></div><span id="tryline" hidden></span>
       <div style="justify-self:end">${qualityHtml(book)}</div></div>
     <div class="strip wide">${book.pages.map((p, n) => p.inside ? `<button data-i="${n}" aria-label="Copyright page" style="background:var(--paper);color:var(--ink);font-size:13px">©</button>` : `<button data-i="${n}" aria-label="${pageName(p)}"><img src="${p.url}?thumb=1" alt="" loading="lazy"></button>`).join("")}<button data-i="${book.pages.length}" aria-label="Back cover: About Me" style="background:var(--paper);color:var(--ink);font-size:10px;line-height:1.1">About Me</button></div>`;
   const el = $("#book");
@@ -899,7 +899,7 @@ function viewReader(book) {
       <div><div class="stack" id="stack" tabindex="0" aria-label="The book. Use the arrow keys to turn pages."></div>
         <div class="nav"><button class="btn ghost small" id="prev">Back</button><span id="pos" class="note" style="min-width:96px;text-align:center"></span><button class="btn ghost small" id="next">Next</button></div><span id="tryline" hidden></span></div>
       <div>
-        <p class="note">Swipe, drag a page or use the arrow keys to turn the page. Your book stays on your shelf, ready to read again.</p>
+        <p class="note">Swipe, drag a corner or use the arrow keys to turn the page. This book stays on your shelf, so you can come back to it anytime.</p>
         <div class="strip">${book.pages.map((p, n) => p.inside ? `<button data-i="${n}" aria-label="Copyright page" style="background:var(--paper);color:var(--ink);font-size:13px">©</button>` : `<button data-i="${n}" aria-label="${pageName(p)}"><img src="${p.url}?thumb=1" alt="" loading="lazy"></button>`).join("")}<button data-i="${book.pages.length}" aria-label="About Me" style="background:var(--paper);color:var(--ink);font-size:11px;line-height:1.1">About Me</button></div>
         <div style="margin-top:20px">${qualityHtml(book)}</div>
       </div>
@@ -981,7 +981,7 @@ function viewReader(book) {
 async function viewMoney(flash) {
   if (!me?.user) return viewHome();
   setSky(catalog?.stories[0]?.world, true);
-  app.innerHTML = `<p class="note">Opening your account</p>`;
+  app.innerHTML = `<p class="note">Loading your account…</p>`;
   try {
     const [w, { orders }] = await Promise.all([api("/api/wallet"), api("/api/orders").catch(() => ({ orders: [] }))]);
     me.balance = w.balance; drawTop();
@@ -1007,15 +1007,15 @@ async function viewMoney(flash) {
       <section data-panel="activity">
         ${w.ledger.length ? `<div class="card flush"><div class="tablewrap"><table class="dt"><thead><tr><th>Date</th><th>Description</th><th class="num">Amount</th><th class="num">Balance</th></tr></thead><tbody>
           ${w.ledger.map((l) => `<tr><td class="when">${whenLines(l.at)}</td><td><b>${kindLabel[l.kind] || esc(l.kind)}</b><small>${l.bookId ? `<a href="#/book/${l.bookId}">${esc(l.cause)}</a>` : `${esc(l.cause)}${/^book/.test(l.kind) ? " (deleted from your shelf)" : ""}`}</small></td><td class="num ${l.cents > 0 ? "plus" : ""}"><b>${l.cents > 0 ? "+" : "−"}${money(Math.abs(l.cents))}</b></td><td class="num">${money(l.balanceAfter)}</td></tr>`).join("")}
-        </tbody></table></div></div>` : `<div class="card empty"><p>Nothing here yet. Add money to get started; every payment and purchase will show up here.</p></div>`}
+        </tbody></table></div></div>` : `<div class="card empty"><p>No activity yet. Once you add money, every payment and purchase will appear here.</p></div>`}
       </section>
 
       <section data-panel="prints" hidden>
-        ${orders.length ? `<div class="card">${orders.map((o) => orderHtml(o).replace(`<b>Order #${o.id}`, `<b><a href="#/print/${o.bookId}">${esc(o.title)}</a> · Order #${o.id}`)).join("")}</div>` : `<div class="card empty"><p>No printed copies yet. Open a finished book and choose "Order a printed copy".</p></div>`}
+        ${orders.length ? `<div class="card">${orders.map((o) => orderHtml(o).replace(`<b>Order #${o.id}`, `<b><a href="#/print/${o.bookId}">${esc(o.title)}</a> · Order #${o.id}`)).join("")}</div>` : `<div class="card empty"><p>No printed copies yet. To order one, open any finished book and choose "Order a printed copy".</p></div>`}
       </section>
 
       <section data-panel="refunds" hidden>
-        <div class="card"><h3>Refund to your card</h3><p class="note" style="margin-bottom:6px">Unspent money can go back to the card it came from.</p>
+        <div class="card"><h3>Refund to your card</h3><p class="note" style="margin-bottom:6px">Any money you haven't spent can go back to the card you paid with.</p>
           ${w.payments.length ? w.payments.map((p) => {
             const left = Math.min(p.cents - p.refunded, w.balance);
             return `<div class="payrow"><div class="row" style="justify-content:space-between"><span><b>${money(p.cents)}</b> <span class="note">added ${when(p.paid_at)}</span></span>
@@ -1025,7 +1025,7 @@ async function viewMoney(flash) {
                 <input id="r${p.id}" type="number" step="0.01" min="0.50" max="${(left / 100).toFixed(2)}" value="${(left / 100).toFixed(2)}">
                 <label style="margin:0" for="rr${p.id}">Reason <small>optional</small></label><input id="rr${p.id}" type="text" maxlength="200">
                 <button class="btn small">Refund ${money(left)} to my card</button>
-              </form></div>`; }).join("") : `<p class="note">Payments you make will appear here.</p>`}
+              </form></div>`; }).join("") : `<p class="note">Your payments will appear here.</p>`}
         </div>
         ${w.refunds.length ? `<div class="card"><h3>Past refunds</h3><ul class="lines">${w.refunds.map((r) => `<li><span>${when(r.requested_at)}${r.reason ? ` · ${esc(r.reason)}` : ""}</span><span>${money(r.cents)} <span class="pill ${r.status === "processed" ? "good" : r.status === "failed" ? "bad" : "info"}">${r.status === "processed" ? "Sent" : r.status === "failed" ? "Failed" : "Pending"}</span></span></li>`).join("")}</ul></div>` : ""}
       </section>
@@ -1086,14 +1086,14 @@ async function viewPrint(id) {
   catch (e) { app.innerHTML = `<div class="err">${esc(e.message)}</div>`; return; }
   document.documentElement.style.setProperty("--story", COLORS[book.story]);
   setSky(storyOf(book.story)?.world, true);
-  if (book.status !== "done") { app.innerHTML = `<div class="paper"><h2>This book isn't finished</h2><p>Only a finished book can be printed. <a href="#/book/${id}">Back to the book</a></p></div>`; return; }
+  if (book.status !== "done") { app.innerHTML = `<div class="paper"><h2>This book isn't finished</h2><p>Once your book is finished, you can order a printed copy. <a href="#/book/${id}">Back to the book</a></p></div>`; return; }
   const pdf = `/api/books/${id}/pdf`;
   let quoted = null;
   app.innerHTML = `<div class="row" style="justify-content:space-between"><h2>A printed copy of ${esc(book.title)}, starring ${esc(book.child.name)}</h2><a class="btn ghost small" href="#/book/${id}">Back to the book</a></div>
     <div class="print">
       <div class="paper onpaper" id="s1">
         <div class="step ${info.approval ? "done" : ""}"><i>${info.approval ? "✓" : "1"}</i><h3>Check every page</h3></div>
-        <p class="note">This is exactly what we'll print. Take a moment to look through all 22 pages: the front cover, the copyright page, the story and the About Me on the back.</p>
+        <p class="note">This is exactly what we'll print. Take a moment to look through all 22 pages, from the front cover to the About Me on the back.</p>
         <iframe class="pdfview" src="${pdf}?inline=1#view=FitH" title="The book's PDF"></iframe>
         <p class="note"><a href="${pdf}?inline=1" target="_blank" rel="noopener">Open the PDF in a new tab</a> · <a href="${pdf}">Download it</a></p>
         <ul class="prints note">
@@ -1132,7 +1132,7 @@ async function viewPrint(id) {
           <div class="step"><i>3</i><h3>Place the order</h3></div>
           <div id="priceBox"><p class="note">A printed copy is ${money(info.price)}, shipping included. You'll see the full price after the address.</p></div>
           <div id="oerr"></div>
-          <p class="note" style="margin-top:10px">Printed and bound on demand, then shipped by standard mail, usually within 1–2 weeks.</p>
+          <p class="note" style="margin-top:10px">Each copy is printed and bound just for you, then shipped by standard mail. Most orders arrive within 1–2 weeks.</p>
         </div>
       </div>
     </div>
