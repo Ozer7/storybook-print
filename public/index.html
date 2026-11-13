@@ -816,14 +816,14 @@ const pageName = (p) => (p.inside ? "Copyright page" : p.n === 1 ? "Cover" : `Pa
 function viewSpread(book) {
   let at = 0, busy = false;
   const last = book.pages.length + 1;      // pages, About Me, back cover
-  const maxAt = Math.ceil((last + 1) / 2); // the last spread has only its left page
+  const maxAt = Math.floor((last + 1) / 2); // the spread that holds the last page
   const leftOf = (a) => 2 * a - 1, rightOf = (a) => 2 * a;
   const t = book.timing || {};
   const retried = book.pages.filter((p) => (p.attempts || []).filter((x) => !x.skipped).length > 1);
   app.innerHTML = `<div class="row" style="justify-content:space-between"><h2>${esc(book.title)}, starring ${esc(book.child.name)}</h2><div class="row"><a class="btn ghost" href="#/print/${book.id}">Order a printed copy</a><a class="btn" href="/api/books/${book.id}/pdf">Download PDF</a></div></div>
     <div class="spread" id="book" tabindex="0" aria-label="The book. Use the arrow keys to turn pages."></div>
     <div class="readbar"><p class="note">Drag a corner or use the arrow keys to turn the page.</p><div class="nav"><button class="btn ghost small" id="prev">Back</button><span id="pos" class="note" style="min-width:110px;text-align:center"></span><button class="btn ghost small" id="next">Next</button></div><span id="tryline" hidden></span>
-      <div style="justify-self:end">${qualityHtml(book)}</div></div>
+      </div>
     <div class="strip wide">${book.pages.map((p, n) => p.inside ? `<button data-i="${n}" aria-label="Copyright page" style="background:var(--paper);color:var(--ink);font-size:13px">©</button>` : `<button data-i="${n}" aria-label="${pageName(p)}"><img src="${p.url}?thumb=1" alt="" loading="lazy"></button>`).join("")}<button data-i="${book.pages.length}" aria-label="Back cover: About Me" style="background:var(--paper);color:var(--ink);font-size:10px;line-height:1.1">About Me</button></div>`;
   const el = $("#book");
   const face = (n, side) => (n >= 0 && n <= last ? `<div class="side ${side}">${pageHtml(book, n)}</div>` : "");
@@ -915,7 +915,7 @@ function viewReader(book) {
       <div>
         <p class="note">Swipe, drag a corner or use the arrow keys to turn the page. This book stays on your shelf, so you can come back to it anytime.</p>
         <div class="strip">${book.pages.map((p, n) => p.inside ? `<button data-i="${n}" aria-label="Copyright page" style="background:var(--paper);color:var(--ink);font-size:13px">©</button>` : `<button data-i="${n}" aria-label="${pageName(p)}"><img src="${p.url}?thumb=1" alt="" loading="lazy"></button>`).join("")}<button data-i="${book.pages.length}" aria-label="About Me" style="background:var(--paper);color:var(--ink);font-size:11px;line-height:1.1">About Me</button></div>
-        <div style="margin-top:20px">${qualityHtml(book)}</div>
+
       </div>
     </div>`;
   const stack = $("#stack");
