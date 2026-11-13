@@ -1,6 +1,16 @@
 # To do
 
-## This homework: charge for the book
+## This homework: make it a real book
+- [x] **Looks like a real book.** Front cover: the title, "starring" the child. Inside page: copyright notice and publisher (Bluebid Books, bluebid.online), with the book number and edition date. The story starts on the page after it. Back cover: About Me, with the publisher at the foot. The reader's PDF is 22 pages in that order; the on-screen reader shows the copyright page too (`lib/pdf.js`, `public/index.html` `insideHtml`).
+- [x] **Print files.** The interior is the copyright page plus story pages 2–20 = 20 pages at 6.25 × 9.25 in (0.125 in bleed all round), a multiple of 4 as saddle stitch needs. The cover is one sheet, back + spine + front, sized by Lulu's cover-dimensions endpoint. Art is scaled to fill the bleed; the words stay where the solver put them, inside the trim.
+- [x] **Print API: Lulu, sandbox only.** `lib/lulu.js` has the sandbox address hard-coded and no setting for production. Product `0600X0900FCPRESS080CW444GXX` (6 × 9 in, premium full colour, saddle stitch, 80# coated, gloss).
+- [x] **Approve first, nothing sent before.** Step 1 shows the PDF itself, a checkbox and "Approve for printing". The approval stores a hash of every picture, every word placement and the About Me; the order endpoint refuses unless the book still matches it (409), and the print-file links refuse a book that changed (410).
+- [x] **The user enters the address; the app places the order.** US addresses, validated per field (ZIP, state, phone) before Lulu sees them. A live quote from Lulu's cost calculator, then "Place order": the balance is charged and the Lulu print job created in one step; if Lulu refuses, the money goes back at once. Order status is read back from Lulu; an unpaid order can be canceled for a full refund.
+- [x] **Check what the child types.** Three layers before anything is charged (`lib/moderate.js`): rules (letters-only name, no rude words, no phone numbers, emails, links or street addresses), OpenAI moderation, and a model asked whether the name is a real person's name and each detail is fine for a children's book. The error names the field and the form highlights it. Books made before this get checked when someone tries to print them.
+- [x] **Price it.** See the write-up: $19.99 for a printed copy, standard US shipping included.
+- [x] **Carried over.** Everything from "Charge for the book" still runs (below). The old homework is frozen at book.bluebid.online / Ozer7/beanstalk-book; this one is print.bluebid.online / Ozer7/storybook-print, sharing the same database and art.
+
+## Previous homework: charge for the book
 - [x] **Fund, balance, refund and process it, $0.99 per book, transaction history.** A real sandbox payment and a real refund both ran on the live site. Every credit and debit is a ledger row with its cause.
 - [x] **20 pages plus About Me, from one template.** Both stories fill in the same slots (`lib/template.js`).
 - [x] **Character bible in the database**, with pictures edited into every scene. Public at `/bible`.
@@ -29,9 +39,16 @@
 - **Neon free tier is 0.5 GB.** A book is about 7 MB of pictures, so that's about 60 books. Old books should move to object storage.
 - **Books can't start for a short while after a deploy**, while the art loads into memory.
 
+## Print defects and limits
+- **Print resolution is low.** The art is 1024 × 1536, about 170 dpi on a 6 × 9 in page (Lulu recommends 300). Fine on screen, soft on paper. Next: upscale the kept pages once at the end, or paint the faces at higher resolution.
+- **US only.** The address form and the state list are US; Lulu ships worldwide, but tax and shipping would need their own pricing.
+- **One shipping speed.** Standard mail is included in the price; faster shipping isn't offered.
+- **Sandbox orders stop at "unpaid" or "payment in progress".** That's where Lulu's sandbox leaves them unless a test card is on the developer account; they never print.
+- **Spine is blank.** Saddle stitch has almost no spine (Lulu's cover is 0.125 in wider than two covers), so nothing is printed on it.
+- **The checks can be wrong both ways.** The model may reject an unusual real name. The message says why, but there's no appeal button yet.
+
 ## Next
 - **Delete an account** from the app. Deleting a book already works, from the shelf.
 - **Hebrew in the story text.** Names and About Me print in Hebrew now (checked in a live PDF, right to left); the 20 pages of story are still English.
 - **`book.bluebid.online` is a forward.** It opens the site, but the address bar shows the onrender.com address, because Render's workspace plan allows 2 custom domains and the two earlier homeworks use them.
-- **Print quality.** 1024x1536 on a 6x9 in page is about 170 dpi: fine on screen, soft in print.
 - **Stripe webhooks**, if this moves off the class's shared account.
