@@ -56,6 +56,8 @@ await fake.pay(sid);
 assert.equal((await J("/api/wallet/confirm", { method: "POST", json: { sessionId: sid } })).body.credited, true);
 assert.equal((await J("/api/wallet/confirm", { method: "POST", json: { sessionId: sid } })).body.credited, false, "credited only once");
 assert.equal((await J("/api/wallet")).body.balance, 500);
+assert.equal((await J("/api/wallet/fund", { method: "POST", json: { cents: 49 } })).status, 400, "under Stripe's $0.50 minimum");
+assert.equal((await J("/api/wallet/fund", { method: "POST", json: { cents: 99 } })).status, 200, "one book's worth is allowed");
 console.log("fund ok");
 
 // What the child types is checked before anything is charged

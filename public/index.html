@@ -859,9 +859,9 @@ async function viewMoney(flash) {
           <p class="note">${w.balance >= w.bookCents ? `Available balance. A digital book is $0.99 and a printed copy $${((me.printCents || 2499) / 100).toFixed(2)}.` : "A book costs $0.99."}</p>
           <h3 style="margin-top:24px">Add money</h3>
           <div class="row" style="margin-top:10px">
-            ${[500, 1000, 2500].map((c) => `<button class="btn ghost" data-fund="${c}">${money(c)}</button>`).join("")}
+            ${[99, 500, 1000, 2500].map((c) => `<button class="btn ghost" data-fund="${c}">${money(c)}</button>`).join("")}
           </div>
-          <form id="other" class="row" style="margin-top:10px"><input type="number" id="amt" min="1" max="100" step="1" placeholder="Other, in dollars" aria-label="Other amount in dollars" style="flex:1;min-width:130px"><button class="btn ghost">Add</button></form>
+          <form id="other" class="row" style="margin-top:10px"><input type="number" id="amt" min="0.50" max="100" step="0.01" placeholder="Other amount, e.g. 2.50" aria-label="Other amount in dollars" style="flex:1;min-width:130px"><button class="btn ghost">Add</button></form>
           <p class="note" style="margin-top:12px">Payments are handled securely by Stripe. Your card details never reach our servers.</p>
           <div id="merr"></div>
           <h3 style="margin-top:26px">Get a refund</h3>
