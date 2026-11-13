@@ -56,7 +56,7 @@ app.get("/catalog.json", (_req, res) => {
     art: { state: artStatus.state, done: artStatus.done, total: artStatus.total },
     stories: Object.values(STORIES).map((s) => {
       // Each story's most recognisable scene on its cover: Jack up the beanstalk, Red meeting the wolf.
-      const cover = sceneFor(s.key, s.key === "jack" ? 10 : 6) || sceneFor(s.key, 1), world = sceneFor(s.key, s.key === "jack" ? 11 : 8);
+      const cover = sceneFor(s.key, s.key === "jack" ? 9 : 6) || sceneFor(s.key, 1), world = sceneFor(s.key, s.key === "jack" ? 10 : 8);
       return { key: s.key, title: s.title, role: s.role, pronoun: s.defaultPronoun, ready: storyReady(s.key), cover: cover ? Number(cover.image_id) : null, world: world ? Number(world.image_id) : null };
     }),
   });
