@@ -263,6 +263,7 @@ details{margin-top:16px}summary{cursor:pointer;font-weight:700}
 .pwbox button:hover{background:#f3ead6}
 .gate .btn{width:100%}
 .gatefoot{font-size:13px;color:var(--soft)}
+.gate .note{color:var(--soft)}
 .dash{display:grid;gap:18px}
 .dashhead{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap}
 .dashhead .note{color:var(--mist);margin-top:6px}
@@ -273,6 +274,8 @@ details{margin-top:16px}summary{cursor:pointer;font-weight:700}
 .tabs button[aria-selected="true"]{background:var(--paper);color:var(--ink)}
 .tabs button[aria-selected="true"] em{background:#efe4c8}
 .dash section{display:grid;gap:18px}
+.dash section[hidden]{display:none}
+.prod .note{color:var(--soft)}
 .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .kpi{background:var(--paper);color:var(--ink);border-radius:14px;padding:16px 18px;display:grid;gap:2px;box-shadow:0 10px 24px rgba(0,0,0,.28)}
 .kpi span{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--soft)}
@@ -504,7 +507,7 @@ function viewHome() {
         ${me === null ? `<div class="row"><a class="btn big" href="/auth/google">Get started</a>${catalog?.devLogin ? `<a class="btn ghost" href="/auth/dev">Dev sign-in</a>` : ""}</div>` : ""}`}
       </div>
       <div class="pick"><p class="pickhint"><span>${signedIn ? "Start here: choose a story" : "Choose a story to begin"}</span><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 4v15m0 0l-6-6m6 6l6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></p>
-      <div class="duo">${stories.map((s) => { const href = signedIn ? `#/new/${s.key}` : "/auth/google"; return `<div class="bookwrap">${bookCard(s, href)}<a class="btn startbtn" href="${href}" style="--bk:${COLORS[s.key]}">Start ${esc(s.title.replace(/^Little /, ""))} <span aria-hidden="true">→</span></a></div>`; }).join("")}</div></div>
+      <div class="duo">${stories.map((s) => { const href = signedIn ? `#/new/${s.key}` : "/auth/google"; return `<div class="bookwrap">${bookCard(s, href)}<a class="btn startbtn" href="${href}" aria-label="Start ${esc(s.title)}">Start this story <span aria-hidden="true">→</span></a></div>`; }).join("")}</div></div>
     </div>
     ${signedIn ? `<section class="band"><h2>Your books</h2><div id="books" class="shelf"><p class="note">Loading your books…</p></div></section>` : ""}
     <section class="how">
@@ -1182,12 +1185,13 @@ async function viewAdmin() {
   const sales = (r.books + r.prints) / 100, api$ = c.avg * c.books, costs = r.luluCost / 100 + r.stripeFees / 100 + api$, profit = sales - costs;
   const bookCost = c.avg + stripe(99), printCost = lulu != null ? lulu + stripe(a.pricing.print) : null;
   const statusOf = (o) => (o.status === "failed" ? ["Not placed", "bad"] : o.status === "canceled" ? ["Canceled", "bad"] : LULU_STATUS[o.luluStatus] ? [LULU_STATUS[o.luluStatus][0], LULU_STATUS[o.luluStatus][1] || "info"] : [o.luluStatus || o.status, "info"]);
+  const signed = (v) => (v < 0 ? `−${usd(-v)}` : usd(v));
   const bar = (part, whole, cls) => `<span class="bar"><i class="${cls}" style="width:${Math.max(2, Math.min(100, (part / whole) * 100)).toFixed(1)}%"></i></span>`;
   const product = (name, price, rows, cost) => {
     const margin = cost == null ? null : price - cost;
     return `<div class="prod"><div class="prodhead"><span>${name}</span><b>${usd(price)}</b></div>
       <ul>${rows.map(([k, v]) => `<li><span>${k}</span><span>${v == null ? "–" : usd(v, v < 1 ? 3 : 2)}</span></li>`).join("")}</ul>
-      ${margin == null ? `<p class="note">No orders yet to price it.</p>` : `<div class="marg"><span>Margin</span><b class="${margin >= 0 ? "pos" : "neg"}">${usd(margin)} <small>${Math.round((margin / price) * 100)}%</small></b></div>${bar(Math.max(margin, 0), price, "gold")}`}</div>`;
+      ${margin == null ? `<p class="note">No orders yet to price it.</p>` : `<div class="marg"><span>Margin</span><b class="${margin >= 0 ? "pos" : "neg"}">${signed(margin)} <small>${Math.round((margin / price) * 100)}%</small></b></div>${bar(Math.max(margin, 0), price, "gold")}`}</div>`;
   };
   const tabs = [["overview", "Overview"], ["orders", `Print orders <em>${a.orders.length}</em>`], ["books", `Books <em>${a.books.length}</em>`], ["system", "System"]];
   app.innerHTML = `<div class="dash">
@@ -1199,7 +1203,7 @@ async function viewAdmin() {
       <div class="kpis">
         <div class="kpi"><span>Sales</span><b>${usd(sales)}</b><small>${r.booksSold} books · ${r.printsSold} printed copies</small></div>
         <div class="kpi"><span>Costs</span><b>${usd(costs)}</b><small>printing, card fees, AI</small></div>
-        <div class="kpi hero"><span>Profit</span><b>${usd(profit)}</b><small>${sales ? Math.round((profit / sales) * 100) : 0}% of sales</small></div>
+        <div class="kpi hero"><span>Profit</span><b>${signed(profit)}</b><small>${sales ? Math.round((profit / sales) * 100) : 0}% of sales</small></div>
         <div class="kpi"><span>Customer balances</span><b>${usd((r.deposits - r.refundsToCards - r.books - r.prints) / 100)}</b><small>added but not yet spent</small></div>
       </div>
       <div class="cols">
@@ -1228,7 +1232,7 @@ async function viewAdmin() {
 
     <section data-panel="orders">
       ${a.orders.length ? `<div class="card flush"><div class="tablewrap"><table class="dt"><thead><tr><th>Order</th><th>Customer</th><th>Status</th><th class="num">Price</th><th class="num">Lulu</th><th class="num">Margin</th></tr></thead><tbody>
-        ${a.orders.map((o) => { const [label, tone] = statusOf(o); return `<tr><td><b>#${o.id}</b><small>${when(o.createdAt)}${o.luluJobId ? ` · Lulu ${esc(o.luluJobId)}` : ""}</small></td><td>${esc(o.address?.name || "")}<small>${esc(o.email)}</small></td><td><span class="pill ${tone}">${esc(label)}</span></td><td class="num">${money(o.price)}</td><td class="num">${o.quote ? usd(o.quote.total) : "–"}</td><td class="num"><b>${o.margin != null ? usd(o.margin) : "–"}</b></td></tr>`; }).join("")}
+        ${a.orders.map((o) => { const [label, tone] = statusOf(o); return `<tr><td><b>#${o.id}</b><small>${when(o.createdAt)}${o.luluJobId ? ` · Lulu ${esc(o.luluJobId)}` : ""}</small></td><td>${esc(o.address?.name || "")}<small>${esc(o.email)}</small></td><td><span class="pill ${tone}">${esc(label)}</span></td><td class="num">${money(o.price)}</td><td class="num">${o.quote ? usd(o.quote.total) : "–"}</td><td class="num"><b>${o.margin != null ? signed(o.margin) : "–"}</b></td></tr>`; }).join("")}
       </tbody></table></div></div>` : `<div class="card empty"><p>No print orders yet.</p></div>`}
     </section>
 
